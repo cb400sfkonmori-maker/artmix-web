@@ -3,30 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>株式会社 Art mix | Business Design</title>
+    <title>株式会社 Art mix | Business Strategy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             background-color: #121212; /* 漆黒の背景 */
-            color: #ffffff; /* 基本の文字色を白に */
+            color: #ffffff; /* 強制的に白文字 */
             font-family: "Helvetica Neue", Arial, sans-serif;
         }
         .hero-section {
-            padding: 100px 0;
+            padding: 120px 0;
             text-align: center;
-            background: linear-gradient(135deg, #000000 0%, #2c3e50 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a2530 100%);
         }
         .hero-title {
-            font-size: 3.5rem;
-            font-weight: bold;
-            letter-spacing: 0.1em;
+            font-size: 4.5rem; /* タイトルを少し大きく */
+            font-weight: 800;
+            letter-spacing: 0.05em;
             color: #ffffff;
+            margin-bottom: 20px;
         }
         .hero-subtitle {
-            font-size: 1.2rem;
-            color: #cccccc; /* 少し明るいグレー */
-            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #4a90e2; /* サブタイトルを「参謀の青」に */
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+        }
+        .hero-desc {
+            color: #cccccc;
+            font-size: 1.0rem;
+            margin-top: 10px;
         }
         .section-title {
             border-bottom: 2px solid #4a90e2;
@@ -35,19 +43,19 @@
             margin-bottom: 40px;
             margin-top: 60px;
             color: #ffffff;
+            font-weight: bold;
         }
         .card {
             background-color: #1e1e1e;
             border: 1px solid #444;
-            color: #ffffff; /* カード内の文字も強制的に白 */
+            color: #ffffff;
             transition: transform 0.3s;
         }
         .card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
             border-color: #4a90e2;
         }
-        /* 説明文を確実に白くする */
         .service-desc {
             color: #e0e0e0 !important; 
             font-size: 0.95rem;
@@ -60,20 +68,24 @@
         .btn-custom {
             background-color: #4a90e2;
             color: white;
-            padding: 10px 30px;
-            border-radius: 30px;
+            padding: 12px 40px;
+            border-radius: 50px;
             font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
         }
         .btn-custom:hover {
             background-color: #357abd;
             color: white;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
         }
         footer {
-            background-color: #000;
-            padding: 40px 0;
+            background-color: #050505;
+            padding: 50px 0;
             text-align: center;
             font-size: 0.8rem;
             color: #888;
+            border-top: 1px solid #333;
         }
     </style>
 </head>
@@ -82,8 +94,10 @@
     <div class="hero-section">
         <div class="container">
             <h1 class="hero-title">Art mix</h1>
-            <p class="hero-subtitle">Business is Art.<br>経営を、地域の未来を、デザインする。</p>
-            <a href="#services" class="btn btn-custom mt-4">View Our Works</a>
+            <p class="hero-subtitle">Business Strategy by Art mix</p>
+            <p class="hero-desc">経営を、地域の未来を、デザインする。</p>
+            
+            <a href="#services" class="btn btn-custom mt-5">View Solutions</a>
         </div>
     </div>
 
@@ -168,8 +182,9 @@
 
     <footer id="contact">
         <div class="container">
-            <p class="mb-1 text-white"><strong>株式会社 Art mix</strong></p>
-            <p class="mb-1 text-secondary">群馬県藤岡市</p>
+            <p class="mb-1 text-white" style="font-size: 1.2rem;"><strong>株式会社 Art mix</strong></p>
+            <p class="mb-1 text-secondary">Business Strategy by Art mix</p>
+            <p class="small text-secondary mt-3">群馬県藤岡市</p>
             <p class="small text-secondary">代表取締役 小森 さおり / 執行役員・CSO 小森 隼也</p>
             <hr style="width: 50px; margin: 20px auto; border-color: #666;">
             <p>&copy; 2026 Art mix Inc. All Rights Reserved.</p>
