@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>株式会社G-WORKS | 採用特設サイト (Demo)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        /* 蛍光イエローをアクセントに（現場の安全ベストと若者っぽさ） */
+        .accent {
+            color: #ccff00;
+        }
+        .bg-accent {
+            background-color: #ccff00;
+            color: #000;
+        }
+        /* TikTok風の全画面ヒーローエリア */
+        .hero {
+            height: 80vh;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+            transform: skew(-5deg); /* 斜めにして勢いを出す */
+        }
+        .tagline {
+            font-size: 1.2rem;
+            background: #000;
+            padding: 5px 15px;
+            margin-top: 20px;
+            display: inline-block;
+            border: 2px solid #ccff00;
+        }
+        /* スピード応募ボタン */
+        .btn-line {
+            background-color: #06c755; /* LINE色 */
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 15px 40px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(6, 199, 85, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .benefit-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .demo-bar {
+            background: #d63384;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            font-size: 0.8rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="demo-bar">
+        DEMO PAGE produced by Art mix
+    </div>
+
+    <div class="hero">
+        <h1 class="mt-5">街を、<br><span class="accent">支配しろ。</span></h1>
+        <div class="tagline">未経験 OK / 月収 35万〜</div>
+        
+        <div class="mt-5">
+            <p class="mb-2 text-white small">履歴書不要。スマホで1分完了。</p>
+            <a href="#" class="btn btn-line">
+                <i class="fab fa-line"></i> LINEでエントリー
+            </a>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <h2 class="text-center mb-4 font-weight-bold">WHY US?</h2>
+        <p class="text-center text-secondary mb-5">ウチを選ぶ、3つの理由。</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="benefit-card text-center">
+                    <i class="fas fa-money-bill-wave fa-3x accent mb-3"></i>
+                    <h4>ガッツリ稼ぐ</h4>
+                    <p class="text-secondary">日払い・週払い対応。<br>欲しい時に、現金で。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="benefit-card text-center">
+                    <i class="fas fa-motorcycle fa-3x accent mb-3"></i>
+                    <h4>遊びも本気</h4>
+                    <p class="text-secondary">バイク・車いじり放題。<br>ガレージ完備の寮あり。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="benefit-card text-center">
+                    <i class="fas fa-users fa-3x accent mb-3"></i>
+                    <h4>最高の仲間</h4>
+                    <p class="text-secondary">面倒な上下関係なし。<br>実力があれば即昇給。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-accent py-5 text-black">
+        <div class="container text-center">
+            <h3 class="font-weight-bold mb-3">MESSAGE</h3>
+            <p class="lead font-weight-bold">「中卒？ 関係ねえよ。」</p>
+            <p>
+                大事なのは、過去じゃなくて「今」だろ。<br>
+                俺たちの現場で、お前の力を試してみないか。<br>
+                道具も服も全部貸す。体ひとつで来い。
+            </p>
+            <div class="mt-4">
+                <span class="badge bg-black text-white p-2">代表取締役 社長</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 text-center text-secondary">
+        <p class="small">株式会社G-WORKS（架空のデモ企業）</p>
+        <hr class="border-secondary mx-auto" style="width: 50px;">
+        <p class="small text-white">PRODUCED BY <strong class="text-primary">Art mix</strong></p>
+        <div class="mt-3">
+            <a href="index.html" class="btn btn-outline-light btn-sm">← Art mix サイトに戻る</a>
+        </div>
+    </footer>
+
+</body>
+</html>
