@@ -29,7 +29,7 @@
             margin-top: 20px;
         }
         .section-title {
-            border-bottom: 2px solid #4a90e2; /* アクセントの青 */
+            border-bottom: 2px solid #4a90e2;
             display: inline-block;
             padding-bottom: 10px;
             margin-bottom: 40px;
@@ -37,13 +37,20 @@
         }
         .card {
             background-color: #1e1e1e;
-            border: none;
+            border: 1px solid #333; /* カードの輪郭を少し強調 */
             color: white;
             transition: transform 0.3s;
         }
         .card:hover {
-            transform: translateY(-10px); /* ホバー時に浮き上がる */
+            transform: translateY(-10px);
             box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
+            border-color: #4a90e2;
+        }
+        /* ★修正ポイント：説明文を明るく読みやすく */
+        .service-desc {
+            color: #d0d0d0 !important; /* 明るいグレーに変更 */
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
         .btn-custom {
             background-color: #4a90e2;
@@ -61,7 +68,7 @@
             padding: 40px 0;
             text-align: center;
             font-size: 0.8rem;
-            color: #666;
+            color: #888;
         }
     </style>
 </head>
@@ -80,7 +87,7 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-md-8">
                 <h2 class="section-title">Philosophy</h2>
-                <p class="lead">
+                <p class="lead" style="color: #ccc;">
                     キャンバスに絵を描くように、ビジネスの未来を描く。<br>
                     IT、数字、そして戦略をミックスし、<br>
                     企業のポテンシャルを最大化する「参謀」として共に走ります。
@@ -98,8 +105,8 @@
                     <div class="card-body">
                         <i class="fas fa-chess-king fa-3x mb-3 text-primary"></i>
                         <h4 class="card-title">Strategic Planning</h4>
-                        <p class="card-text">経営参謀・顧問</p>
-                        <p class="small text-muted">
+                        <p class="card-text text-primary mb-3">経営参謀・顧問</p>
+                        <p class="service-desc">
                             「利益なき繁忙」からの脱却。<br>
                             管理会計に基づいたキャッシュフロー経営と、
                             リスクを回避する鉄壁の規定作りを支援します。
@@ -113,8 +120,8 @@
                     <div class="card-body">
                         <i class="fas fa-laptop-code fa-3x mb-3 text-primary"></i>
                         <h4 class="card-title">Digital Transformation</h4>
-                        <p class="card-text">業務アプリ開発・DX</p>
-                        <p class="small text-muted">
+                        <p class="card-text text-primary mb-3">業務アプリ開発・DX</p>
+                        <p class="service-desc">
                             高額なシステムは不要。<br>
                             現場で本当に使える「利益シミュレーター」や
                             「業務効率化アプリ」を、必要な機能だけに絞って開発します。
@@ -128,8 +135,8 @@
                     <div class="card-body">
                         <i class="fas fa-palette fa-3x mb-3 text-primary"></i>
                         <h4 class="card-title">Regional Design</h4>
-                        <p class="card-text">地域ブランディング</p>
-                        <p class="small text-muted">
+                        <p class="card-text text-primary mb-3">地域ブランディング</p>
+                        <p class="service-desc">
                             採用支援、事業承継、そしてアート教育。<br>
                             藤岡というキャンバスに、
                             次世代に残すべき文化と経済圏をデザインします。
@@ -145,9 +152,8 @@
                 <div class="col-md-8">
                     <div class="card p-4">
                         <h5>💰 建設業向け 利益シミュレーター</h5>
-                        <p>現場ごとの収支を瞬時に可視化し、赤字受注を防ぐための戦略ツール。</p>
-                        <a href="https://profit-tool-xxxx.streamlit.app" target="_blank" class="btn btn-outline-light">Launch App <i class="fas fa-external-link-alt"></i></a>
-                        <p class="small text-muted mt-2">※現在はデモ稼働中です</p>
+                        <p class="service-desc">現場ごとの収支を瞬時に可視化し、赤字受注を防ぐための戦略ツール。</p>
+                        <a href="https://profit-tool-z9oxq7iapuvuf3tdwq3ey4.streamlit.app/" target="_blank" class="btn btn-outline-light mt-3">Launch App <i class="fas fa-external-link-alt"></i></a>
                     </div>
                 </div>
             </div>
