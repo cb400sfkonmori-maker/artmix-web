@@ -9,7 +9,7 @@
     <style>
         body {
             background-color: #121212; /* 漆黒の背景 */
-            color: #e0e0e0;
+            color: #ffffff; /* 基本の文字色を白に */
             font-family: "Helvetica Neue", Arial, sans-serif;
         }
         .hero-section {
@@ -25,7 +25,7 @@
         }
         .hero-subtitle {
             font-size: 1.2rem;
-            color: #a8a8a8;
+            color: #cccccc; /* 少し明るいグレー */
             margin-top: 20px;
         }
         .section-title {
@@ -34,11 +34,12 @@
             padding-bottom: 10px;
             margin-bottom: 40px;
             margin-top: 60px;
+            color: #ffffff;
         }
         .card {
             background-color: #1e1e1e;
-            border: 1px solid #333; /* カードの輪郭を少し強調 */
-            color: white;
+            border: 1px solid #444;
+            color: #ffffff; /* カード内の文字も強制的に白 */
             transition: transform 0.3s;
         }
         .card:hover {
@@ -46,11 +47,15 @@
             box-shadow: 0 10px 20px rgba(74, 144, 226, 0.2);
             border-color: #4a90e2;
         }
-        /* ★修正ポイント：説明文を明るく読みやすく */
+        /* 説明文を確実に白くする */
         .service-desc {
-            color: #d0d0d0 !important; /* 明るいグレーに変更 */
+            color: #e0e0e0 !important; 
             font-size: 0.95rem;
             line-height: 1.6;
+            margin-top: 10px;
+        }
+        .lead {
+            color: #e0e0e0 !important;
         }
         .btn-custom {
             background-color: #4a90e2;
@@ -76,7 +81,7 @@
 
     <div class="hero-section">
         <div class="container">
-            <h1 class="hero-title">artmix</h1>
+            <h1 class="hero-title">Art mix</h1>
             <p class="hero-subtitle">Business is Art.<br>経営を、地域の未来を、デザインする。</p>
             <a href="#services" class="btn btn-custom mt-4">View Our Works</a>
         </div>
@@ -87,7 +92,7 @@
         <div class="row justify-content-center text-center mb-5">
             <div class="col-md-8">
                 <h2 class="section-title">Philosophy</h2>
-                <p class="lead" style="color: #ccc;">
+                <p class="lead">
                     キャンバスに絵を描くように、ビジネスの未来を描く。<br>
                     IT、数字、そして戦略をミックスし、<br>
                     企業のポテンシャルを最大化する「参謀」として共に走ります。
@@ -104,8 +109,8 @@
                 <div class="card h-100 p-4 text-center">
                     <div class="card-body">
                         <i class="fas fa-chess-king fa-3x mb-3 text-primary"></i>
-                        <h4 class="card-title">Strategic Planning</h4>
-                        <p class="card-text text-primary mb-3">経営参謀・顧問</p>
+                        <h4 class="card-title text-white">Strategic Planning</h4>
+                        <p class="card-text text-primary mb-2">経営参謀・顧問</p>
                         <p class="service-desc">
                             「利益なき繁忙」からの脱却。<br>
                             管理会計に基づいたキャッシュフロー経営と、
@@ -119,8 +124,8 @@
                 <div class="card h-100 p-4 text-center">
                     <div class="card-body">
                         <i class="fas fa-laptop-code fa-3x mb-3 text-primary"></i>
-                        <h4 class="card-title">Digital Transformation</h4>
-                        <p class="card-text text-primary mb-3">業務アプリ開発・DX</p>
+                        <h4 class="card-title text-white">Digital Transformation</h4>
+                        <p class="card-text text-primary mb-2">業務アプリ開発・DX</p>
                         <p class="service-desc">
                             高額なシステムは不要。<br>
                             現場で本当に使える「利益シミュレーター」や
@@ -134,8 +139,8 @@
                 <div class="card h-100 p-4 text-center">
                     <div class="card-body">
                         <i class="fas fa-palette fa-3x mb-3 text-primary"></i>
-                        <h4 class="card-title">Regional Design</h4>
-                        <p class="card-text text-primary mb-3">地域ブランディング</p>
+                        <h4 class="card-title text-white">Regional Design</h4>
+                        <p class="card-text text-primary mb-2">地域ブランディング</p>
                         <p class="service-desc">
                             採用支援、事業承継、そしてアート教育。<br>
                             藤岡というキャンバスに、
@@ -151,9 +156,9 @@
             <div class="row justify-content-center">
                 <div class="col-md-8">
                     <div class="card p-4">
-                        <h5>💰 建設業向け 利益シミュレーター</h5>
+                        <h5 class="text-white">💰 建設業向け 利益シミュレーター</h5>
                         <p class="service-desc">現場ごとの収支を瞬時に可視化し、赤字受注を防ぐための戦略ツール。</p>
-                        <a href="https://profit-tool-z9oxq7iapuvuf3tdwq3ey4.streamlit.app/" target="_blank" class="btn btn-outline-light mt-3">Launch App <i class="fas fa-external-link-alt"></i></a>
+                        <a href="https://profit-tool-z9oxq7iapuvuf3tdwq3ey4.streamlit.app" target="_blank" class="btn btn-outline-light mt-3">Launch App <i class="fas fa-external-link-alt"></i></a>
                     </div>
                 </div>
             </div>
@@ -163,11 +168,11 @@
 
     <footer id="contact">
         <div class="container">
-            <p class="mb-1"><strong>株式会社 Art mix</strong></p>
-            <p class="mb-1">群馬県藤岡市</p>
-            <p class="small text-muted">代表取締役 小森 さおり / 執行役員・CSO 小森 隼也</p>
+            <p class="mb-1 text-white"><strong>株式会社 Art mix</strong></p>
+            <p class="mb-1 text-secondary">群馬県藤岡市</p>
+            <p class="small text-secondary">代表取締役 小森 さおり / 執行役員・CSO 小森 隼也</p>
             <hr style="width: 50px; margin: 20px auto; border-color: #666;">
-            <p>&copy; 2026 artmix Inc. All Rights Reserved.</p>
+            <p>&copy; 2026 Art mix Inc. All Rights Reserved.</p>
         </div>
     </footer>
 
