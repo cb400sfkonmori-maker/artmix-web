@@ -243,21 +243,16 @@
 <script>
     // カンマ区切りのフォーマット関数
     function formatInput(input) {
-        // カーソル位置を保存（自然な入力のため）
         let cursorPosition = input.selectionStart;
         let originalLength = input.value.length;
-
-        // 数字以外を削除
         let value = input.value.replace(/,/g, '').replace(/[^0-9]/g, '');
         
-        // 数値があればカンマ区切りに
         if (value) {
             input.value = Number(value).toLocaleString();
         } else {
             input.value = '';
         }
 
-        // カーソル位置の調整（桁が増えた場合など）
         let newLength = input.value.length;
         cursorPosition = cursorPosition + (newLength - originalLength);
         input.setSelectionRange(cursorPosition, cursorPosition);
@@ -270,7 +265,6 @@
     }
 
     function calculate() {
-        // カンマを除去して数値化
         const sales = parseCurrency(document.getElementById('sales').value);
         const food = parseCurrency(document.getElementById('food').value);
         const labor = parseCurrency(document.getElementById('labor').value);
@@ -285,13 +279,11 @@
         const flRate = fRate + lRate;
         const profit = sales - (food + labor);
 
-        // 結果表示
         document.getElementById('resF').innerText = fRate.toFixed(1) + '%';
         document.getElementById('resL').innerText = lRate.toFixed(1) + '%';
         document.getElementById('resFL').innerText = flRate.toFixed(1) + '%';
         document.getElementById('resProfit').innerText = profit.toLocaleString() + '円';
 
-        // 診断ロジック（目安データに合わせて微調整）
         const diagBox = document.getElementById('diagnosis');
         diagBox.className = "diagnosis-box"; 
         
@@ -313,8 +305,6 @@
         
         diagBox.innerHTML = msg;
         document.getElementById('resultArea').style.display = 'block';
-        
-        // スクロール
         document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
