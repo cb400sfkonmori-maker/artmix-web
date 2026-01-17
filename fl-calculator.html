@@ -101,4 +101,223 @@
             text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .kpi-label { font-size: 0.8rem; color: #7f
+        .kpi-label { font-size: 0.8rem; color: #7f8c8d; }
+        .kpi-value { font-size: 1.2rem; font-weight: bold; }
+
+        .diagnosis-box {
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+        .bg-safe { background-color: var(--safe); }
+        .bg-warning { background-color: var(--warning); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .bg-danger { background-color: var(--danger); }
+
+        /* 参考データエリア */
+        .reference-data {
+            margin-top: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .reference-data h4 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #eee; padding-bottom: 5px;}
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .ref-table th, .ref-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; }
+        .ref-table th { background-color: #f8f9fa; font-weight: bold; }
+        .highlight { color: var(--primary); font-weight: bold; }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.7rem;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1><i class="fas fa-calculator"></i> FL Cost Analyzer</h1>
+        <p>Food Business Management Tool</p>
+    </header>
+
+    <div class="form-section">
+        <div class="input-group">
+            <label><i class="fas fa-yen-sign"></i> 月間売上高 (Sales)</label>
+            <input type="text" id="sales" placeholder="3,000,000" oninput="formatInput(this)">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-utensils"></i> 材料費 (Food Cost)</label>
+            <div class="hint-text">
+                <strong>定義：</strong>食材や飲料にかかる費用。<br>仕入れ価格に加え、ロス（廃棄）なども含まれます。
+            </div>
+            <input type="text" id="food" placeholder="1,000,000" oninput="formatInput(this)">
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-user-friends"></i> 人件費 (Labor Cost)</label>
+            <div class="hint-text">
+                <strong>定義：</strong>労働に関わるすべての費用。<br>給与、雇用保険、福利厚生などが含まれます。
+            </div>
+            <input type="text" id="labor" placeholder="900,000" oninput="formatInput(this)">
+        </div>
+
+        <button class="btn-calc" onclick="calculate()">診断スタート</button>
+    </div>
+
+    <div class="result-section" id="resultArea">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">F比率 (原価)</div>
+                <div class="kpi-value" id="resF">--%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">L比率 (人件費)</div>
+                <div class="kpi-value" id="resL">--%</div>
+            </div>
+            <div class="kpi-card" style="grid-column: span 2; border: 2px solid #333;">
+                <div class="kpi-label">FLコスト合計</div>
+                <div class="kpi-value" id="resFL" style="font-size: 1.8rem;">--%</div>
+            </div>
+            <div class="kpi-card" style="grid-column: span 2;">
+                <div class="kpi-label">FL利益 (手残り)</div>
+                <div class="kpi-value" id="resProfit">--円</div>
+            </div>
+        </div>
+        
+        <div id="diagnosis" class="diagnosis-box"></div>
+
+        <div class="reference-data">
+            <h4><i class="fas fa-chart-line"></i> 業界目安 (Benchmark)</h4>
+            <p>※一般的な目安です。業態により異なります。</p>
+            <ul>
+                <li>ファストフード: 25%〜35%</li>
+                <li>カジュアルダイニング: 30%〜40%</li>
+                <li>高級レストラン: 35%〜45%</li>
+            </ul>
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>業態</th>
+                        <th>F(材料)</th>
+                        <th>L(人件費)</th>
+                        <th>FL目安</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>中華料理</td>
+                        <td>31%</td>
+                        <td>28%</td>
+                        <td>59%</td>
+                    </tr>
+                    <tr>
+                        <td>イタリアン・フレンチ</td>
+                        <td>32%</td>
+                        <td>28%</td>
+                        <td class="highlight">60%</td>
+                    </tr>
+                    <tr>
+                        <td>寿司屋</td>
+                        <td>42%</td>
+                        <td>24%</td>
+                        <td>66%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Junya Komori / Food Business Engineer
+    </footer>
+</div>
+
+<script>
+    // カンマ区切りのフォーマット関数
+    function formatInput(input) {
+        // カーソル位置を保存（自然な入力のため）
+        let cursorPosition = input.selectionStart;
+        let originalLength = input.value.length;
+
+        // 数字以外を削除
+        let value = input.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+        
+        // 数値があればカンマ区切りに
+        if (value) {
+            input.value = Number(value).toLocaleString();
+        } else {
+            input.value = '';
+        }
+
+        // カーソル位置の調整（桁が増えた場合など）
+        let newLength = input.value.length;
+        cursorPosition = cursorPosition + (newLength - originalLength);
+        input.setSelectionRange(cursorPosition, cursorPosition);
+    }
+
+    // 数値に戻す関数
+    function parseCurrency(valueStr) {
+        if (!valueStr) return 0;
+        return parseInt(valueStr.replace(/,/g, ''), 10);
+    }
+
+    function calculate() {
+        // カンマを除去して数値化
+        const sales = parseCurrency(document.getElementById('sales').value);
+        const food = parseCurrency(document.getElementById('food').value);
+        const labor = parseCurrency(document.getElementById('labor').value);
+
+        if (!sales || !food || !labor) {
+            alert("全ての項目に数値を入力してください");
+            return;
+        }
+
+        const fRate = (food / sales) * 100;
+        const lRate = (labor / sales) * 100;
+        const flRate = fRate + lRate;
+        const profit = sales - (food + labor);
+
+        // 結果表示
+        document.getElementById('resF').innerText = fRate.toFixed(1) + '%';
+        document.getElementById('resL').innerText = lRate.toFixed(1) + '%';
+        document.getElementById('resFL').innerText = flRate.toFixed(1) + '%';
+        document.getElementById('resProfit').innerText = profit.toLocaleString() + '円';
+
+        // 診断ロジック（目安データに合わせて微調整）
+        const diagBox = document.getElementById('diagnosis');
+        diagBox.className = "diagnosis-box"; 
+        
+        let msg = "";
+        
+        if (flRate <= 55) {
+            diagBox.classList.add("bg-safe");
+            msg = "【判定：優良 S】<br>素晴らしい収益性です。<br>この利益を次の投資（販促・設備）に回せます。";
+        } else if (flRate <= 60) {
+            diagBox.classList.add("bg-safe");
+            msg = "【判定：適正 A】<br>イタリアン・フレンチの標準ラインです。<br>合格点ですが、気を抜くとすぐに悪化します。";
+        } else if (flRate <= 65) {
+            diagBox.classList.add("bg-warning");
+            msg = "【判定：注意 B】<br>少しバランスが悪いです。<br>食材ロスか、暇な時間の人件費を見直してください。";
+        } else {
+            diagBox.classList.add("bg-danger");
+            msg = "【判定：危険 C】<br>赤字リスクが高い状態です。<br>業態目安と乖離しています。抜本的な見直しが必要です。";
+        }
+        
+        diagBox.innerHTML = msg;
+        document.getElementById('resultArea').style.display = 'block';
+        
+        // スクロール
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
