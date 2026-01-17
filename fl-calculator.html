@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLコスト・利益構造診断 | Junya Komori Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全体設定 */
+        :root {
+            --primary: #c0392b; /* 食欲をそそる赤 */
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --safe: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+        }
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* アプリのコンテナ */
+        .app-container {
+            background: white;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* ヘッダー */
+        header {
+            background-color: var(--dark);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 { margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        header p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.8; }
+
+        /* 入力フォーム */
+        .form-section { padding: 25px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--dark); font-size: 0.9rem; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+        .input-group input:focus { border-color: var(--primary); outline: none; }
+
+        /* 計算ボタン */
+        .btn-calc {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn-calc:hover { opacity: 0.9; }
+
+        /* 結果表示エリア */
+        .result-section {
+            display: none; /* 初期は非表示 */
+            background-color: #f1f2f6;
+            padding: 25px;
+            border-top: 1px solid #ddd;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .kpi-label { font-size: 0.8rem; color: #7f8c8d; margin-bottom: 5px; }
+        .kpi-value { font-size: 1.3rem; font-weight: bold; color: var(--dark); }
+
+        /* 診断コメント */
+        .diagnosis-box {
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+        .bg-safe { background-color: var(--safe); }
+        .bg-warning { background-color: var(--warning); }
+        .bg-danger { background-color: var(--danger); }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.7rem;
+            color: #95a5a6;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1><i class="fas fa-calculator"></i> FL Cost Analyzer</h1>
+        <p>Food Business Management Tool</p>
+    </header>
+
+    <div class="form-section">
+        <div class="input-group">
+            <label><i class="fas fa-yen-sign"></i> 月間売上高 (Sales)</label>
+            <input type="number" id="sales" placeholder="例: 3000000">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-utensils"></i> 材料費 (Food Cost)</label>
+            <input type="number" id="food" placeholder="例: 1000000">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-user-friends"></i> 人件費 (Labor Cost)</label>
+            <input type="number" id="labor" placeholder="例: 900000">
+        </div>
+        <button class="btn-calc" onclick="calculate()">診断スタート</button>
+    </div>
+
+    <div class="result-section" id="resultArea">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">F比率 (原価)</div>
+                <div class="kpi-value" id="resF">--%</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">L比率 (人件費)</div>
+                <div class="kpi-value" id="resL">--%</div>
+            </div>
+            <div class="kpi-card" style="grid-column: span 2; border: 2px solid #333;">
+                <div class="kpi-label">FLコスト合計</div>
+                <div class="kpi-value" id="resFL" style="font-size: 1.8rem;">--%</div>
+            </div>
+            <div class="kpi-card" style="grid-column: span 2;">
+                <div class="kpi-label">FL利益 (残るお金)</div>
+                <div class="kpi-value" id="resProfit">--円</div>
+            </div>
+        </div>
+        
+        <div id="diagnosis" class="diagnosis-box"></div>
+    </div>
+
+    <footer>
+        &copy; 2026 Junya Komori / Food Business Engineer
+    </footer>
+</div>
+
+<script>
+    function calculate() {
+        const sales = parseFloat(document.getElementById('sales').value);
+        const food = parseFloat(document.getElementById('food').value);
+        const labor = parseFloat(document.getElementById('labor').value);
+
+        if (!sales || !food || !labor) {
+            alert("全ての項目に数値を入力してください");
+            return;
+        }
+
+        const fRate = (food / sales) * 100;
+        const lRate = (labor / sales) * 100;
+        const flRate = fRate + lRate;
+        const profit = sales - (food + labor);
+
+        // 結果の表示
+        document.getElementById('resF').innerText = fRate.toFixed(1) + '%';
+        document.getElementById('resL').innerText = lRate.toFixed(1) + '%';
+        document.getElementById('resFL').innerText = flRate.toFixed(1) + '%';
+        document.getElementById('resProfit').innerText = profit.toLocaleString() + '円';
+
+        // 診断ロジック
+        const diagBox = document.getElementById('diagnosis');
+        diagBox.className = "diagnosis-box"; // クラスリセット
+        
+        let msg = "";
+        if (flRate <= 55) {
+            diagBox.classList.add("bg-safe");
+            msg = "【判定：優良 S】<br>素晴らしい経営状態です。<br>高収益体質ですので、次の投資へ進みましょう。";
+        } else if (flRate <= 60) {
+            diagBox.classList.add("bg-safe"); // 60%までは安全圏とする
+            msg = "【判定：適正 A】<br>合格ラインです。<br>FかL、どちらかあと2%削れば利益が跳ね上がります。";
+        } else if (flRate <= 65) {
+            diagBox.classList.add("bg-warning");
+            msg = "【判定：注意 B】<br>利益圧迫の兆候あり。<br>廃棄ロスやシフトの組みすぎを見直してください。";
+        } else {
+            diagBox.classList.add("bg-danger");
+            msg = "【判定：危険 C】<br>赤字転落リスクが高い状態です。<br>今すぐ価格改定か業務改善が必要です。";
+        }
+        
+        diagBox.innerHTML = msg;
+        document.getElementById('resultArea').style.display = 'block';
+        
+        // スクロール
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
