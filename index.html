@@ -383,35 +383,22 @@ async function sendMessage() {
     const messageText = input.value.trim();
     if (!messageText) return;
 
-    // 1. ユーザーメッセージを表示
     appendMessage(messageText, 'user');
     input.value = '';
 
-    // 2. キーの合体（ユーザー様のロジックを継承）
     const keyPart1 = "AIzaSy"; 
-    const keyPart2 = "BYFcnn1ocbiQ3lVKOawPeVEbvqsdvBAwQ"; 
+    const keyPart2 = "BLsnoB_T7TCvI0o-1QZmgxC0nWfkuDKo8"; 
     const API_KEY = keyPart1 + keyPart2;
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
+    // 最新モデルを指定
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini--flash-latest:generateContent?key=${API_KEY}`;
 
-    // 3. キーワードによる自動モード判別
-    let mode = "戦略全般";
-    if (messageText.match(/(現場|建設|見積|工期|材料費|職人)/)) mode = "建設・製造（原価管理）";
-    if (messageText.match(/(飲食|FL|原価|メニュー|店|人件費)/)) mode = "飲食・サービス（構造改革）";
-    if (messageText.match(/(藤岡|地域|採用|承継|MVV|ビジョン)/)) mode = "ビジョン・地域デザイン";
+    const systemInstruction = `あなたは小森隼也の分身です。
+    応用化学科卒のサイエンス思考で、経営をF1のレースに例えて分析します。
+    【制約】
+    ・100文字程度の簡潔な文章で、結論から述べること。
+    ・必ず文章を最後まで完結させること。
+    ・「利益率はラップタイムだ！」という哲学を含めること。`;
 
-    // 4. システムインストラクションの構築
-    const systemInstruction = `
-    あなたは小森隼也（Junya Komori）の分身AIです。
-    応用化学科卒のサイエンス思考で、ビジネスを分子レベルで分解して分析します。
-    
-    【現在のモード】: ${mode}
-    【制約事項】
-    ・回答は100文字以内の「短文」で、結論から述べること。
-    ・「利益率はラップタイムだ！」などのF1や科学の比喩を必ず1つ含めること。
-    ・「未来を動かすハンドルと、どこへでも行ける地図を」渡す参謀として振る舞うこと。
-    `;
-
-    // 5. APIリクエストの実行
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
@@ -420,22 +407,18 @@ async function sendMessage() {
                 contents: [{ parts: [{ text: messageText }] }],
                 system_instruction: { parts: [{ text: systemInstruction }] },
                 generationConfig: { 
-                    maxOutputTokens: 150, 
-                    temperature: 0.8 // 隼也さんらしい「熱量」を出すために少し高めに設定
+                    maxOutputTokens: 400, // ここを増やしてブツ切りを防止！
+                    temperature: 0.7 
                 }
             })
         });
 
         const data = await response.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            const aiText = data.candidates[0].content.parts[0].text;
-            appendMessage(aiText, 'ai');
-        } else {
-            throw new Error('Invalid response');
-        }
+        const aiText = data.candidates[0].content.parts[0].text;
+        appendMessage(aiText, 'ai');
+        
     } catch (error) {
-        console.error('API Error:', error);
-        appendMessage('エンジンの調整が必要です。少し時間を置いてから再度アクセルを踏んでください。', 'ai');
+        appendMessage('エンジンの調整が必要です。ピットインして少しお待ちください。', 'ai');
     }
 }
     function appendMessage(text, sender) {
