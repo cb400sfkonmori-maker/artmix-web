@@ -336,21 +336,35 @@
             <p>&copy; 2026 Art mix Inc. All Rights Reserved.</p>
         </div>
     </footer>
-<div style="background-color: #4a90e2; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="profile.jpg" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid white;">
-        <span style="font-weight: bold; color: white;">Junya Komori AI</span>
-    </div>
-    <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer; color: white;"></i>
+<div id="ai-chat-trigger" onclick="toggleChat()" style="position: fixed; bottom: 30px; right: 30px; display: flex; align-items: center; background-color: white; padding: 8px 20px 8px 8px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); z-index: 1000; transition: all 0.3s ease;">
+    <img src="profile.jpg" alt="小森隼也" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #eee;">
+    <span style="color: #1a3a5a; font-weight: bold; font-size: 0.9rem;">AI隼也に相談する</span>
 </div>
-    <div style="padding: 15px; border-top: 1px solid #333; display: flex; gap: 10px;">
-        <input type="text" id="chat-input" placeholder="メッセージを入力..." style="flex: 1; background: #121212; border: 1px solid #444; color: white; border-radius: 20px; padding: 8px 15px; font-size: 0.9rem; outline: none;">
-        <button onclick="sendMessage()" style="background: none; border: none; color: #4a90e2; cursor: pointer;">
+
+<div id="ai-chat-window" style="display: none; position: fixed; bottom: 100px; right: 30px; width: 360px; height: 500px; background-color: #1e1e1e; border: 1px solid #4a90e2; border-radius: 20px; flex-direction: column; overflow: hidden; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.4);">
+    <div style="background-color: #4a90e2; padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="profile.jpg" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid white;">
+            <span style="font-weight: bold; color: white;">Junya Komori AI</span>
+        </div>
+        <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer; color: white;"></i>
+    </div>
+    
+    <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #121212;">
+        <div style="background-color: #2a2a2a; color: #fff; padding: 12px 16px; border-radius: 15px 15px 15px 0; max-width: 85%; align-self: flex-start; font-size: 0.9rem; line-height: 1.6;">
+            <strong>「利益率はラップタイムだ！」</strong><br><br>
+            Art mixの小森です。 未来を動かすハンドルと地図を、一緒に描いてみませんか？<br>
+            経営のボトルネックを分解し、次のステージへ加速するための戦略を共に考えましょう。
+        </div>
+    </div>
+
+    <div style="padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background-color: #1e1e1e;">
+        <input type="text" id="chat-input" placeholder="メッセージを入力..." style="flex: 1; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 25px; padding: 10px 20px; font-size: 0.9rem; outline: none;">
+        <button onclick="sendMessage()" style="background: #4a90e2; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
             <i class="fas fa-paper-plane"></i>
         </button>
     </div>
 </div>
-
 <script>
     function toggleChat() {
         const chatWindow = document.getElementById('ai-chat-window');
