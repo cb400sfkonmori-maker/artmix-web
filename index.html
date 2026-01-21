@@ -378,22 +378,66 @@
         }
     }
 
-    async function sendMessage() {
-        const input = document.getElementById('chat-input');
-        const messageText = input.value.trim();
-        if (!messageText) return;
+async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const messageText = input.value.trim();
+    if (!messageText) return;
 
-        // User message
-        appendMessage(messageText, 'user');
-        input.value = '';
+    // 1. ユーザーメッセージを表示
+    appendMessage(messageText, 'user');
+    input.value = '';
 
-        // AI Response (Mock)
-        // ここにGemini API等の呼び出し処理を記述できます
-        setTimeout(() => {
-            appendMessage("「利益率はラップタイムだ！」の精神で、あなたの課題を分析します。具体的な数字や状況を教えていただけますか？", 'ai');
-        }, 1000);
+    // 2. キーの合体（ユーザー様のロジックを継承）
+    const keyPart1 = "AIzaSy"; 
+    const keyPart2 = "BYFcnn1ocbiQ3lVKOawPeVEbvqsdvBAwQ"; 
+    const API_KEY = keyPart1 + keyPart2;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    // 3. キーワードによる自動モード判別
+    let mode = "戦略全般";
+    if (messageText.match(/(現場|建設|見積|工期|材料費|職人)/)) mode = "建設・製造（原価管理）";
+    if (messageText.match(/(飲食|FL|原価|メニュー|店|人件費)/)) mode = "飲食・サービス（構造改革）";
+    if (messageText.match(/(藤岡|地域|採用|承継|MVV|ビジョン)/)) mode = "ビジョン・地域デザイン";
+
+    // 4. システムインストラクションの構築
+    const systemInstruction = `
+    あなたは小森隼也（Junya Komori）の分身AIです。
+    応用化学科卒のサイエンス思考で、ビジネスを分子レベルで分解して分析します。
+    
+    【現在のモード】: ${mode}
+    【制約事項】
+    ・回答は100文字以内の「短文」で、結論から述べること。
+    ・「利益率はラップタイムだ！」などのF1や科学の比喩を必ず1つ含めること。
+    ・「未来を動かすハンドルと、どこへでも行ける地図を」渡す参謀として振る舞うこと。
+    `;
+
+    // 5. APIリクエストの実行
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: messageText }] }],
+                system_instruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: { 
+                    maxOutputTokens: 150, 
+                    temperature: 0.8 // 隼也さんらしい「熱量」を出すために少し高めに設定
+                }
+            })
+        });
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            appendMessage(aiText, 'ai');
+        } else {
+            throw new Error('Invalid response');
+        }
+    } catch (error) {
+        console.error('API Error:', error);
+        appendMessage('エンジンの調整が必要です。少し時間を置いてから再度アクセルを踏んでください。', 'ai');
     }
-
+}
     function appendMessage(text, sender) {
         const container = document.getElementById('chat-messages');
         const msgDiv = document.createElement('div');
