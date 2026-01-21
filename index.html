@@ -336,6 +336,72 @@
             <p>&copy; 2026 Art mix Inc. All Rights Reserved.</p>
         </div>
     </footer>
+<div style="background-color: #4a90e2; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="profile.jpg" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid white;">
+        <span style="font-weight: bold; color: white;">Junya Komori AI</span>
+    </div>
+    <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer; color: white;"></i>
+</div>
+    <div style="padding: 15px; border-top: 1px solid #333; display: flex; gap: 10px;">
+        <input type="text" id="chat-input" placeholder="メッセージを入力..." style="flex: 1; background: #121212; border: 1px solid #444; color: white; border-radius: 20px; padding: 8px 15px; font-size: 0.9rem; outline: none;">
+        <button onclick="sendMessage()" style="background: none; border: none; color: #4a90e2; cursor: pointer;">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
 
+<script>
+    function toggleChat() {
+        const chatWindow = document.getElementById('ai-chat-window');
+        const trigger = document.getElementById('ai-chat-trigger');
+        if (chatWindow.style.display === 'none') {
+            chatWindow.style.display = 'flex';
+            trigger.style.transform = 'rotate(90deg)';
+        } else {
+            chatWindow.style.display = 'none';
+            trigger.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const messageText = input.value.trim();
+        if (!messageText) return;
+
+        // User message
+        appendMessage(messageText, 'user');
+        input.value = '';
+
+        // AI Response (Mock)
+        // ここにGemini API等の呼び出し処理を記述できます
+        setTimeout(() => {
+            appendMessage("「利益率はラップタイムだ！」の精神で、あなたの課題を分析します。具体的な数字や状況を教えていただけますか？", 'ai');
+        }, 1000);
+    }
+
+    function appendMessage(text, sender) {
+        const container = document.getElementById('chat-messages');
+        const msgDiv = document.createElement('div');
+        
+        const isUser = sender === 'user';
+        msgDiv.style.padding = '10px 15px';
+        msgDiv.style.borderRadius = isUser ? '10px 10px 0 10px' : '10px 10px 10px 0';
+        msgDiv.style.maxWidth = '85%';
+        msgDiv.style.fontSize = '0.9rem';
+        msgDiv.style.alignSelf = isUser ? 'flex-end' : 'flex-start';
+        msgDiv.style.backgroundColor = isUser ? '#4a90e2' : '#333';
+        msgDiv.style.color = 'white';
+        msgDiv.textContent = text;
+        
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Enterキーで送信
+    document.getElementById('chat-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
 </body>
 </html>
