@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +9,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            background-color: #121212; /* 漆黒の背景 */
-            color: #ffffff; /* 強制的に白文字 */
+            background-color: #121212;
+            /* 漆黒の背景 */
+            color: #ffffff;
+            /* 強制的に白文字 */
             font-family: "Helvetica Neue", Arial, sans-serif;
         }
-.hero-section {
+
+        .hero-section {
             padding: 150px 0;
             text-align: center;
-            position: relative; /* ★重要：これを追加 */
-            overflow: hidden;   /* ★重要：はみ出し防止 */
+            position: relative;
+            /* ★重要：これを追加 */
+            overflow: hidden;
+            /* ★重要：はみ出し防止 */
         }
 
         /* ▼▼▼ 新しく追加する動画用の設定 ▼▼▼ */
@@ -30,37 +36,46 @@
             height: auto;
             transform: translateX(-50%) translateY(-50%);
             z-index: -2;
-            opacity: 0.6; /* 動画の明るさ（0.6くらいがおすすめ） */
+            opacity: 0.6;
+            /* 動画の明るさ（0.6くらいがおすすめ） */
         }
+
         .hero-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* 文字を見やすくする黒フィルター */
+            background: rgba(0, 0, 0, 0.6);
+            /* 文字を見やすくする黒フィルター */
             z-index: -1;
         }
+
         /* ▲▲▲ 追加ここまで ▲▲▲ */
         .hero-title {
-            font-size: 4.5rem; /* タイトルを少し大きく */
+            font-size: 4.5rem;
+            /* タイトルを少し大きく */
             font-weight: 800;
             letter-spacing: 0.05em;
             color: #ffffff;
             margin-bottom: 20px;
         }
+
         .hero-subtitle {
             font-size: 1.5rem;
-            color: #4a90e2; /* サブタイトルを「参謀の青」に */
+            color: #4a90e2;
+            /* サブタイトルを「参謀の青」に */
             font-weight: 300;
             margin-bottom: 10px;
             letter-spacing: 0.1em;
         }
+
         .hero-desc {
             color: #cccccc;
             font-size: 1.0rem;
             margin-top: 10px;
         }
+
         .section-title {
             border-bottom: 2px solid #4a90e2;
             display: inline-block;
@@ -70,26 +85,31 @@
             color: #ffffff;
             font-weight: bold;
         }
+
         .card {
             background-color: #1e1e1e;
             border: 1px solid #444;
             color: #ffffff;
             transition: transform 0.3s;
         }
+
         .card:hover {
             transform: translateY(-10px);
             box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
             border-color: #4a90e2;
         }
+
         .service-desc {
-            color: #e0e0e0 !important; 
+            color: #e0e0e0 !important;
             font-size: 0.95rem;
             line-height: 1.6;
             margin-top: 10px;
         }
+
         .lead {
             color: #e0e0e0 !important;
         }
+
         .btn-custom {
             background-color: #4a90e2;
             color: white;
@@ -99,11 +119,13 @@
             font-size: 1.1rem;
             transition: all 0.3s;
         }
+
         .btn-custom:hover {
             background-color: #357abd;
             color: white;
             box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
         }
+
         footer {
             background-color: #050505;
             padding: 50px 0;
@@ -112,8 +134,97 @@
             color: #888;
             border-top: 1px solid #333;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #4a90e2;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-title {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .modal-subtitle {
+            color: #4a90e2;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .modal-body-section {
+            margin-bottom: 15px;
+            color: #ddd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .modal-body-section strong {
+            display: block;
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .modal-btn-area {
+            text-align: center;
+            margin-top: 25px;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="hero-section">
@@ -125,13 +236,13 @@
             <h1 class="hero-title">Art mix</h1>
             <p class="hero-subtitle">Business Strategy by Art mix</p>
             <p class="hero-desc">経営を、地域の未来を、デザインする。</p>
-            
+
             <a href="#services" class="btn btn-custom mt-5">View Solutions</a>
         </div>
     </div>
 
     <div class="container py-5" id="services">
-        
+
         <div class="row justify-content-center text-center mb-5">
             <div class="col-md-8">
                 <h2 class="section-title">Philosophy</h2>
@@ -146,7 +257,7 @@
         <div class="text-center">
             <h2 class="section-title">Services</h2>
         </div>
-        
+
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="card h-100 p-4 text-center">
@@ -154,11 +265,11 @@
                         <i class="fas fa-chess-king fa-3x mb-3 text-primary"></i>
                         <h4 class="card-title text-white">Strategic Planning</h4>
                         <p class="card-text text-primary mb-2">経営参謀・顧問</p>
-<p class="service-desc">
-    「利益なき繁忙」からの脱却。<br>
-    管理会計に基づいたキャッシュフロー経営と、
-    会社を守るための「社内ルールの設計」を支援します。
-</p>
+                        <p class="service-desc">
+                            「利益なき繁忙」からの脱却。<br>
+                            管理会計に基づいたキャッシュフロー経営と、
+                            会社を守るための「社内ルールの設計」を支援します。
+                        </p>
                     </div>
                 </div>
             </div>
@@ -194,12 +305,12 @@
             </div>
         </div>
 
-       <div class="text-center mt-5">
+        <div class="text-center mt-5">
             <h2 class="section-title">Portfolio & Solutions</h2>
             <p class="mb-5 text-secondary">クライアントの課題を解決するために開発した、実際のツールとスキームです。</p>
-            
+
             <div class="row g-4 justify-content-center">
-                
+
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
                         <div class="mb-3">
@@ -212,48 +323,50 @@
                             赤字受注を未然に防ぐWebアプリ。
                         </p>
                         <div class="mt-auto pt-3">
-                            <a href="https://profit-tool-z9oxq7iapuvuf3tdwq3ey4.streamlit.app" target="_blank" class="btn btn-sm btn-outline-light">
+                            <a href="https://profit-tool-z9oxq7iapuvuf3tdwq3ey4.streamlit.app" target="_blank"
+                                class="btn btn-sm btn-outline-light">
                                 Launch App <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-    <div class="card h-100 p-4">
-        <div class="mb-3">
-            <span class="badge bg-danger">Food / Consulting</span>
-        </div>
-        <h5 class="text-white">飲食店向け<br>FLコスト・利益診断</h5>
-        <p class="service-desc">
-            「ドンブリ勘定」からの脱却。<br>
-            材料費(F)と人件費(L)のバランスを瞬時に解析し、
-            儲かる店への構造改革を支援するWebアプリ。
-        </p>
-        <div class="mt-auto pt-3">
-            <a href="fl-calculator.html" target="_blank" class="btn btn-sm btn-outline-light">
-                Launch App <i class="fas fa-external-link-alt"></i>
-            </a>
-        </div>
-    </div>
-</div>
+                    <div class="card h-100 p-4">
+                        <div class="mb-3">
+                            <span class="badge bg-danger">Food / Consulting</span>
+                        </div>
+                        <h5 class="text-white">飲食店向け<br>FLコスト・利益診断</h5>
+                        <p class="service-desc">
+                            「ドンブリ勘定」からの脱却。<br>
+                            材料費(F)と人件費(L)のバランスを瞬時に解析し、
+                            儲かる店への構造改革を支援するWebアプリ。
+                        </p>
+                        <div class="mt-auto pt-3">
+                            <a href="fl-calculator.html" target="_blank" class="btn btn-sm btn-outline-light">
+                                Launch App <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-4">
-    <div class="card h-100 p-4">
-        <div class="mb-3">
-            <span class="badge bg-danger">Consulting</span>
-        </div>
-        <h5 class="text-white">原価管理<br>AIコンサルタント</h5>
-        <p class="service-desc">
-            「利益率はラップタイムだ！」<br>
-            製造・飲食業のコスト課題をF1理論で解決する対話型AI。
-            Google Gemini APIを活用した、クセの強い鬼コンサルタント。
-        </p>
-        <div class="mt-auto pt-3">
-            <a href="https://cb400sfkonmori-maker.github.io/ai-portfolio/" target="_blank" class="btn btn-sm btn-outline-light">
-                Talk to AI 🏎️ <i class="fas fa-external-link-alt"></i>
-            </a>
-        </div>
-    </div>
-</div>
+                    <div class="card h-100 p-4">
+                        <div class="mb-3">
+                            <span class="badge bg-danger">Consulting</span>
+                        </div>
+                        <h5 class="text-white">原価管理<br>AIコンサルタント</h5>
+                        <p class="service-desc">
+                            「利益率はラップタイムだ！」<br>
+                            製造・飲食業のコスト課題をF1理論で解決する対話型AI。
+                            Google Gemini APIを活用した、クセの強い鬼コンサルタント。
+                        </p>
+                        <div class="mt-auto pt-3">
+                            <a href="https://cb400sfkonmori-maker.github.io/ai-portfolio/" target="_blank"
+                                class="btn btn-sm btn-outline-light">
+                                Talk to AI 🏎️ <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
                         <div class="mb-3">
@@ -287,8 +400,42 @@
                         </p>
                         <div class="mt-auto pt-3">
                             <a href="recruit.html" target="_blank" class="btn btn-sm btn-outline-light">
-    View Demo <i class="fas fa-eye"></i>
-</a>
+                                View Demo <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 p-4">
+                        <div class="mb-3">
+                            <span class="badge" style="background-color: #6f42c1;">Management / KPI</span>
+                        </div>
+                        <h5 class="text-white">設備稼働率連動型<br>営業評価制度構築</h5>
+                        <p class="service-desc">
+                            「売上はあるのに利益が残らない」製造業へ。眠っている設備を稼働させ、追加投資なしで利益を最大化する評価制度改革パッケージ。
+                        </p>
+                        <div class="mt-auto pt-3">
+                            <button class="btn btn-sm btn-outline-light" data-modal-target="modal-kpi">
+                                Contact / Inquiry <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 p-4">
+                        <div class="mb-3">
+                            <span class="badge" style="background-color: #20c997;">Carbon Neutral / GX</span>
+                        </div>
+                        <h5 class="text-white">サプライチェーン対応型<br>脱炭素・省エネ経営支援</h5>
+                        <p class="service-desc">
+                            「CO2排出量を報告せよ」という大手からの要請に対応。単なる数値計算に留まらず、専門パートナーと連携した実質的な省エネ診断・再エネ導入で、コスト削減と取引継続を実現。
+                        </p>
+                        <div class="mt-auto pt-3">
+                            <button class="btn btn-sm btn-outline-light" data-modal-target="modal-gx">
+                                View Details <i class="fas fa-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -296,153 +443,293 @@
             </div>
         </div>
         <div class="container py-5 border-top border-secondary">
-        <div class="row justify-content-center align-items-center">
-            <div class="col-md-3 text-center mb-4 mb-md-0">
-              <img src="profile.jpg" alt="小森隼也" 
-     class="img-fluid rounded-circle border border-2 border-primary shadow-lg" 
-     style="width: 160px; height: 160px; object-fit: cover; object-position: top;">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-3 text-center mb-4 mb-md-0">
+                    <img src="profile.jpg" alt="小森隼也"
+                        class="img-fluid rounded-circle border border-2 border-primary shadow-lg"
+                        style="width: 160px; height: 160px; object-fit: cover; object-position: top;">
+                </div>
+                <div class="col-md-7">
+                    <h6 class="text-primary mb-2" style="letter-spacing: 2px;">CHIEF BUSINESS STRATEGIST</h6>
+                    <h3 class="text-white mb-3">小森 隼也 <span style="font-size: 1rem; margin-left: 10px;"
+                            class="text-secondary">Junya Komori</span></h3>
+                    <p class="service-desc">
+                        <strong>「理系思考 × 現場叩き上げ × 丸の内戦略」</strong>
+                    </p>
+                    <p class="service-desc">
+                        応用化学科卒。物質の構造を分解するように、ビジネスの課題を論理的に分解する「サイエンス思考」が武器。<br>
+                        大手インフラ企業にて、製造工場の原価管理・品質保証（QC）を歴任し、モノづくりの現場を熟知。
+                        その後、東京・丸の内本社にて事業企画・経営戦略に従事。
+                    </p>
+                    <p class="service-desc">
+                        「泥臭い現場」と「洗練された戦略」の双方を知る稀有な参謀として、
+                        地域企業の経営を次のステージへ導く。
+                    </p>
+                </div>
             </div>
-            <div class="col-md-7">
-                <h6 class="text-primary mb-2" style="letter-spacing: 2px;">CHIEF BUSINESS STRATEGIST</h6>
-                <h3 class="text-white mb-3">小森 隼也 <span style="font-size: 1rem; margin-left: 10px;" class="text-secondary">Junya Komori</span></h3>
-                <p class="service-desc">
-                    <strong>「理系思考 × 現場叩き上げ × 丸の内戦略」</strong>
+        </div>
+        <footer id="contact">
+            <div class="container">
+                <p class="mb-1 text-white" style="font-size: 1.2rem;"><strong>株式会社 Art mix</strong></p>
+                <p class="mb-1 text-secondary">Business Strategy by Art mix</p>
+                <p class="small text-secondary mt-3">群馬県藤岡市</p>
+                <p class="small text-secondary">代表取締役 小森 さおり / CBS 小森 隼也</p>
+                <p class="mt-3">
+                    <i class="fas fa-envelope text-primary me-2"></i>
+                    <a href="mailto:cb400sf.konmori@gmail.com" class="text-white text-decoration-none"
+                        style="letter-spacing: 1px;">
+                        cb400sf.konmori@gmail.com
+                    </a>
                 </p>
-                <p class="service-desc">
-                    応用化学科卒。物質の構造を分解するように、ビジネスの課題を論理的に分解する「サイエンス思考」が武器。<br>
-                    大手インフラ企業にて、製造工場の原価管理・品質保証（QC）を歴任し、モノづくりの現場を熟知。
-                    その後、東京・丸の内本社にて事業企画・経営戦略に従事。
-                </p>
-                <p class="service-desc">
-                    「泥臭い現場」と「洗練された戦略」の双方を知る稀有な参謀として、
-                    地域企業の経営を次のステージへ導く。
-                </p>
+                <hr style="width: 50px; margin: 20px auto; border-color: #666;">
+                <p>&copy; 2026 Art mix Inc. All Rights Reserved.</p>
+            </div>
+        </footer>
+        <div id="ai-chat-trigger" onclick="toggleChat()"
+            style="position: fixed; bottom: 30px; right: 30px; display: flex; align-items: center; background-color: white; padding: 8px 20px 8px 8px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); z-index: 1000; transition: all 0.3s ease;">
+            <img src="profile.jpg" alt="小森隼也"
+                style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #eee;">
+            <span style="color: #1a3a5a; font-weight: bold; font-size: 0.9rem;">AI隼也に相談する</span>
+        </div>
+
+        <div id="ai-chat-window"
+            style="display: none; position: fixed; bottom: 100px; right: 30px; width: 360px; height: 500px; background-color: #1e1e1e; border: 1px solid #4a90e2; border-radius: 20px; flex-direction: column; overflow: hidden; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.4);">
+            <div
+                style="background-color: #4a90e2; padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="profile.jpg"
+                        style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid white;">
+                    <span style="font-weight: bold; color: white;">Junya Komori AI</span>
+                </div>
+                <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer; color: white;"></i>
+            </div>
+
+            <div id="chat-messages"
+                style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #121212;">
+                <div
+                    style="background-color: #2a2a2a; color: #fff; padding: 12px 16px; border-radius: 15px 15px 15px 0; max-width: 85%; align-self: flex-start; font-size: 0.9rem; line-height: 1.6;">
+                    <strong>「利益率はラップタイムだ！」</strong><br><br>
+                    Art mixの小森です。 未来を動かすハンドルと地図を、一緒に描いてみませんか？<br>
+                    経営のボトルネックを分解し、次のステージへ加速するための戦略を共に考えましょう。
+                </div>
+            </div>
+
+            <div
+                style="padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background-color: #1e1e1e;">
+                <input type="text" id="chat-input" placeholder="メッセージを入力..."
+                    style="flex: 1; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 25px; padding: 10px 20px; font-size: 0.9rem; outline: none;">
+                <button onclick="sendMessage()"
+                    style="background: #4a90e2; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
-    </div>
-    <footer id="contact">
-        <div class="container">
-            <p class="mb-1 text-white" style="font-size: 1.2rem;"><strong>株式会社 Art mix</strong></p>
-            <p class="mb-1 text-secondary">Business Strategy by Art mix</p>
-            <p class="small text-secondary mt-3">群馬県藤岡市</p>
-            <p class="small text-secondary">代表取締役 小森 さおり / CBS 小森 隼也</p>
-            <p class="mt-3">
-                <i class="fas fa-envelope text-primary me-2"></i>
-                <a href="mailto:cb400sf.konmori@gmail.com" class="text-white text-decoration-none" style="letter-spacing: 1px;">
-                    cb400sf.konmori@gmail.com
-                </a>
-            </p>
-            <hr style="width: 50px; margin: 20px auto; border-color: #666;">
-            <p>&copy; 2026 Art mix Inc. All Rights Reserved.</p>
+
+        <!-- Modals -->
+        <!-- Modal 1: Management / KPI -->
+        <div class="modal-overlay" id="modal-kpi">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h3 class="modal-title">設備稼働率連動型<br>営業評価制度構築</h3>
+                <p class="modal-subtitle">～「売上至上主義」が工場を殺す前に～</p>
+
+                <div class="modal-body-section">
+                    <strong>The Trap（陥りやすい罠）:</strong>
+                    御社の営業会議で「売上目標未達だ！何でもいいから仕事を取ってこい！」という会話はありませんか？その結果、忙しいラインに安値の仕事がねじ込まれ、利益率は低下し、一方で高価な機械がホコリを被る…。これは営業の責任ではなく、経営指標の責任です。
+                </div>
+
+                <div class="modal-body-section">
+                    <strong>The Logic（解決策）:</strong>
+                    製造業の利益の源泉は「売上高」ではなく「設備稼働率（固定費の回収）」です。必要なのは、工場の「空き時間」を売り歩く営業スタイルへの転換です。
+                </div>
+
+                <div class="modal-body-section">
+                    <strong>Our Solution:</strong>
+                    1. <strong>ボトルネック診断:</strong> 工場の「稼ぎ頭」と「お荷物設備」を特定。<br>
+                    2. <strong>評価制度リデザイン:</strong> 「売上額」ではなく「設備チャージ回収額（限界利益）」を評価指標へ。<br>
+                    3. <strong>営業×工場の連携:</strong> 工場が作ってほしいものを営業が売る仕組みへ。
+                </div>
+
+                <div class="modal-body-section">
+                    <strong>Outcome:</strong>
+                    何も投資せず、ルールを変えるだけで利益率が改善する「筋肉質な工場」へ生まれ変わります。
+                </div>
+
+                <div class="modal-btn-area">
+                    <a href="#contact" class="btn btn-custom modal-close-btn">お問い合わせフォームへ</a>
+                </div>
+            </div>
         </div>
-    </footer>
-<div id="ai-chat-trigger" onclick="toggleChat()" style="position: fixed; bottom: 30px; right: 30px; display: flex; align-items: center; background-color: white; padding: 8px 20px 8px 8px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); z-index: 1000; transition: all 0.3s ease;">
-    <img src="profile.jpg" alt="小森隼也" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 1px solid #eee;">
-    <span style="color: #1a3a5a; font-weight: bold; font-size: 0.9rem;">AI隼也に相談する</span>
-</div>
 
-<div id="ai-chat-window" style="display: none; position: fixed; bottom: 100px; right: 30px; width: 360px; height: 500px; background-color: #1e1e1e; border: 1px solid #4a90e2; border-radius: 20px; flex-direction: column; overflow: hidden; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.4);">
-    <div style="background-color: #4a90e2; padding: 18px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="profile.jpg" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid white;">
-            <span style="font-weight: bold; color: white;">Junya Komori AI</span>
+        <!-- Modal 2: Carbon Neutral / GX -->
+        <div class="modal-overlay" id="modal-gx">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h3 class="modal-title">サプライチェーン対応型<br>脱炭素・省エネ経営支援</h3>
+                <p class="modal-subtitle">～「やらされる脱炭素」から「儲かる省エネ」へ～</p>
+
+                <div class="modal-body-section">
+                    <strong>The Pain（切実な悩み）:</strong>
+                    大手メーカーからの「CO2排出量を報告せよ」という通達。答えられなければ取引停止のリスクも。しかし、専任担当者を置く余裕はない…。
+                </div>
+
+                <div class="modal-body-section">
+                    <strong>The Reality:</strong>
+                    現場が欲しいのは「綺麗な報告書」ではなく、「どうすればコストをかけずに減らせるか」という具体的な対策です。
+                </div>
+
+                <div class="modal-body-section">
+                    <strong>Our Solution:</strong>
+                    1. <strong>現状の可視化:</strong> 複雑なCO2排出量計算を代行し、大手フォーマットに対応。<br>
+                    2. <strong>実戦的省エネ診断:</strong> 設備・エネルギーの専門家と連携し、エアー漏れや熱ロスなど「泥臭い現場改善」を実行。<br>
+                    3. <strong>補助金活用:</strong> 省エネ補助金をフル活用し、実質負担を最小化。
+                </div>
+
+                <div class="modal-body-section">
+                    <strong>Outcome:</strong>
+                    大手からの「選ばれるサプライヤー」認定と、エネルギーコスト削減による利益体質の強化を実現します。
+                </div>
+
+                <div class="modal-btn-area">
+                    <a href="#contact" class="btn btn-custom modal-close-btn">お問い合わせフォームへ</a>
+                </div>
+            </div>
         </div>
-        <i class="fas fa-times" onclick="toggleChat()" style="cursor: pointer; color: white;"></i>
-    </div>
-    
-    <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #121212;">
-        <div style="background-color: #2a2a2a; color: #fff; padding: 12px 16px; border-radius: 15px 15px 15px 0; max-width: 85%; align-self: flex-start; font-size: 0.9rem; line-height: 1.6;">
-            <strong>「利益率はラップタイムだ！」</strong><br><br>
-            Art mixの小森です。 未来を動かすハンドルと地図を、一緒に描いてみませんか？<br>
-            経営のボトルネックを分解し、次のステージへ加速するための戦略を共に考えましょう。
-        </div>
-    </div>
 
-    <div style="padding: 20px; border-top: 1px solid #333; display: flex; gap: 10px; background-color: #1e1e1e;">
-        <input type="text" id="chat-input" placeholder="メッセージを入力..." style="flex: 1; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 25px; padding: 10px 20px; font-size: 0.9rem; outline: none;">
-        <button onclick="sendMessage()" style="background: #4a90e2; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
-            <i class="fas fa-paper-plane"></i>
-        </button>
-    </div>
-</div>
-<script>
-    function toggleChat() {
-        const chatWindow = document.getElementById('ai-chat-window');
-        const trigger = document.getElementById('ai-chat-trigger');
-        if (chatWindow.style.display === 'none') {
-            chatWindow.style.display = 'flex';
-            trigger.style.transform = 'rotate(90deg)';
-        } else {
-            chatWindow.style.display = 'none';
-            trigger.style.transform = 'rotate(0deg)';
-        }
-    }
+        <script>
+            // Modal Logic
+            document.addEventListener('DOMContentLoaded', () => {
+                const openButtons = document.querySelectorAll('[data-modal-target]');
+                const closeButtons = document.querySelectorAll('.modal-close');
+                const closeActionButtons = document.querySelectorAll('.modal-close-btn');
 
-async function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const messageText = input.value.trim();
-    if (!messageText) return;
+                openButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault(); // Prevent default link behavior
+                        const modalId = button.getAttribute('data-modal-target');
+                        const modal = document.getElementById(modalId);
+                        if (modal) {
+                            openModal(modal);
+                        }
+                    });
+                });
 
-    appendMessage(messageText, 'user');
-    input.value = '';
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const modal = button.closest('.modal-overlay');
+                        closeModal(modal);
+                    });
+                });
 
-    const keyPart1 = "AIzaSy"; 
-    const keyPart2 = "BLsnoB_T7TCvI0o-1QZmgxC0nWfkuDKo8"; 
-    const API_KEY = keyPart1 + keyPart2;
-    // 最新モデルを指定
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini--flash-latest:generateContent?key=${API_KEY}`;
+                // Close modal when action button is clicked (and navigate to contact)
+                closeActionButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const modal = button.closest('.modal-overlay');
+                        closeModal(modal);
+                        // Default anchor behavior will still happen (navigation)
+                    });
+                });
 
-    const systemInstruction = `あなたは小森隼也の分身です。
-    応用化学科卒のサイエンス思考で、経営をF1のレースに例えて分析します。
-    【制約】
-    ・100文字程度の簡潔な文章で、結論から述べること。
-    ・必ず文章を最後まで完結させること。
-    ・「利益率はラップタイムだ！」という哲学を含めること。`;
+                // Close when clicking outside
+                document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                    overlay.addEventListener('click', (e) => {
+                        if (e.target === overlay) {
+                            closeModal(overlay);
+                        }
+                    });
+                });
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: messageText }] }],
-                system_instruction: { parts: [{ text: systemInstruction }] },
-                generationConfig: { 
-                    maxOutputTokens: 400, // ここを増やしてブツ切りを防止！
-                    temperature: 0.7 
+                function openModal(modal) {
+                    if (modal == null) return;
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden'; // Disable background scroll
                 }
-            })
-        });
 
-        const data = await response.json();
-        const aiText = data.candidates[0].content.parts[0].text;
-        appendMessage(aiText, 'ai');
-        
-    } catch (error) {
-        appendMessage('エンジンの調整が必要です。ピットインして少しお待ちください。', 'ai');
-    }
-}
-    function appendMessage(text, sender) {
-        const container = document.getElementById('chat-messages');
-        const msgDiv = document.createElement('div');
-        
-        const isUser = sender === 'user';
-        msgDiv.style.padding = '10px 15px';
-        msgDiv.style.borderRadius = isUser ? '10px 10px 0 10px' : '10px 10px 10px 0';
-        msgDiv.style.maxWidth = '85%';
-        msgDiv.style.fontSize = '0.9rem';
-        msgDiv.style.alignSelf = isUser ? 'flex-end' : 'flex-start';
-        msgDiv.style.backgroundColor = isUser ? '#4a90e2' : '#333';
-        msgDiv.style.color = 'white';
-        msgDiv.textContent = text;
-        
-        container.appendChild(msgDiv);
-        container.scrollTop = container.scrollHeight;
-    }
+                function closeModal(modal) {
+                    if (modal == null) return;
+                    modal.classList.remove('active');
+                    document.body.style.overflow = ''; // Re-enable background scroll
+                }
+            });
 
-    // Enterキーで送信
-    document.getElementById('chat-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
-</script>
+            function toggleChat() {
+                const chatWindow = document.getElementById('ai-chat-window');
+                const trigger = document.getElementById('ai-chat-trigger');
+                if (chatWindow.style.display === 'none') {
+                    chatWindow.style.display = 'flex';
+                    trigger.style.transform = 'rotate(90deg)';
+                } else {
+                    chatWindow.style.display = 'none';
+                    trigger.style.transform = 'rotate(0deg)';
+                }
+            }
+
+            async function sendMessage() {
+                const input = document.getElementById('chat-input');
+                const messageText = input.value.trim();
+                if (!messageText) return;
+
+                appendMessage(messageText, 'user');
+                input.value = '';
+
+                const keyPart1 = "AIzaSy";
+                const keyPart2 = "BLsnoB_T7TCvI0o-1QZmgxC0nWfkuDKo8";
+                const API_KEY = keyPart1 + keyPart2;
+                // 最新モデルを指定
+                const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini--flash-latest:generateContent?key=${API_KEY}`;
+
+                const systemInstruction = `あなたは小森隼也の分身です。
+                応用化学科卒のサイエンス思考で、経営をF1のレースに例えて分析します。
+                【制約】
+                ・100文字程度の簡潔な文章で、結論から述べること。
+                ・必ず文章を最後まで完結させること。
+                ・「利益率はラップタイムだ！」という哲学を含めること。`;
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: messageText }] }],
+                            system_instruction: { parts: [{ text: systemInstruction }] },
+                            generationConfig: {
+                                maxOutputTokens: 400, // ここを増やしてブツ切りを防止！
+                                temperature: 0.7
+                            }
+                        })
+                    });
+
+                    const data = await response.json();
+                    const aiText = data.candidates[0].content.parts[0].text;
+                    appendMessage(aiText, 'ai');
+
+                } catch (error) {
+                    appendMessage('エンジンの調整が必要です。ピットインして少しお待ちください。', 'ai');
+                }
+            }
+            function appendMessage(text, sender) {
+                const container = document.getElementById('chat-messages');
+                const msgDiv = document.createElement('div');
+
+                const isUser = sender === 'user';
+                msgDiv.style.padding = '10px 15px';
+                msgDiv.style.borderRadius = isUser ? '10px 10px 0 10px' : '10px 10px 10px 0';
+                msgDiv.style.maxWidth = '85%';
+                msgDiv.style.fontSize = '0.9rem';
+                msgDiv.style.alignSelf = isUser ? 'flex-end' : 'flex-start';
+                msgDiv.style.backgroundColor = isUser ? '#4a90e2' : '#333';
+                msgDiv.style.color = 'white';
+                msgDiv.textContent = text;
+
+                container.appendChild(msgDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            // Enterキーで送信
+            document.getElementById('chat-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+        </script>
 </body>
+
 </html>
