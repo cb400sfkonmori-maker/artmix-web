@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,18 +14,21 @@
             font-family: "Helvetica Neue", Arial, sans-serif;
             overflow-x: hidden;
         }
+
         /* 蛍光イエローをアクセントに（現場の安全ベストと若者っぽさ） */
         .accent {
             color: #ccff00;
         }
+
         .bg-accent {
             background-color: #ccff00;
             color: #000;
         }
+
         /* TikTok風の全画面ヒーローエリア */
         .hero {
             height: 80vh;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop');
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -34,13 +38,16 @@
             text-align: center;
             position: relative;
         }
+
         .hero h1 {
             font-size: 3.5rem;
             font-weight: 900;
             line-height: 1.1;
-            text-shadow: 0 0 20px rgba(0,0,0,0.8);
-            transform: skew(-5deg); /* 斜めにして勢いを出す */
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            transform: skew(-5deg);
+            /* 斜めにして勢いを出す */
         }
+
         .tagline {
             font-size: 1.2rem;
             background: #000;
@@ -49,9 +56,11 @@
             display: inline-block;
             border: 2px solid #ccff00;
         }
+
         /* スピード応募ボタン */
         .btn-line {
-            background-color: #06c755; /* LINE色 */
+            background-color: #06c755;
+            /* LINE色 */
             color: white;
             font-weight: bold;
             font-size: 1.2rem;
@@ -60,11 +69,21 @@
             box-shadow: 0 0 15px rgba(6, 199, 85, 0.5);
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
+
         .benefit-card {
             background: #1a1a1a;
             border: 1px solid #333;
@@ -72,6 +91,7 @@
             padding: 20px;
             margin-bottom: 15px;
         }
+
         .demo-bar {
             background: #d63384;
             color: white;
@@ -85,16 +105,17 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="demo-bar">
-        DEMO PAGE produced by Art mix
+        DEMO PAGE produced by AxelOn Inc.
     </div>
 
     <div class="hero">
         <h1 class="mt-5">街を、<br><span class="accent">支配しろ。</span></h1>
         <div class="tagline">未経験 OK / 月収 35万〜</div>
-        
+
         <div class="mt-5">
             <p class="mb-2 text-white small">履歴書不要。スマホで1分完了。</p>
             <a href="#" class="btn btn-line">
@@ -150,11 +171,12 @@
     <footer class="py-4 text-center text-secondary">
         <p class="small">株式会社G-WORKS（架空のデモ企業）</p>
         <hr class="border-secondary mx-auto" style="width: 50px;">
-        <p class="small text-white">PRODUCED BY <strong class="text-primary">Art mix</strong></p>
+        <p class="small text-white">PRODUCED BY <strong class="text-primary">AxelOn Inc.</strong></p>
         <div class="mt-3">
-            <a href="index.html" class="btn btn-outline-light btn-sm">← Art mix サイトに戻る</a>
+            <a href="index.html" class="btn btn-outline-light btn-sm">← AxelOn サイトに戻る</a>
         </div>
     </footer>
 
 </body>
+
 </html>
