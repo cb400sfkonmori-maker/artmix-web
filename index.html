@@ -222,7 +222,190 @@
             text-align: center;
             margin-top: 25px;
         }
+
+        /* AxelOn Bacronym Section */
+        .bacronym-section {
+            padding: 120px 0;
+            background-color: #0d0d0d;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid #222;
+        }
+
+        .bacronym-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(74, 144, 226, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74, 144, 226, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+        }
+
+        .bacronym-section::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 400px;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.08) 0%, transparent 70%);
+            filter: blur(100px);
+            pointer-events: none;
+        }
+
+        .bacronym-container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .bacronym-list {
+            position: relative;
+            padding-left: 20px;
+        }
+
+        /* 縦線の道しるべ */
+        .bacronym-list::before {
+            content: '';
+            position: absolute;
+            left: 60px;
+            top: 40px;
+            bottom: 40px;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(74, 144, 226, 0.5), transparent);
+        }
+
+        .bacronym-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .bacronym-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bacronym-initial {
+            font-size: 5.5rem;
+            font-weight: 900;
+            color: #4a90e2;
+            width: 100px;
+            text-align: center;
+            line-height: 1;
+            text-shadow: 0 0 25px rgba(74, 144, 226, 0.4);
+            font-family: 'Outfit', sans-serif;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        /* 点火イメージの光点 */
+        .bacronym-item:nth-child(5) .bacronym-initial::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(74, 144, 226, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: fire-pulse 2s infinite alternate;
+        }
+
+        @keyframes fire-pulse {
+            from {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+
+            to {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        .bacronym-content {
+            margin-left: 50px;
+            padding-left: 30px;
+            border-left: 2px solid rgba(74, 144, 226, 0.2);
+        }
+
+        .bacronym-word {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 4px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .bacronym-meaning {
+            font-size: 1.1rem;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .bacronym-desc {
+            font-size: 1rem;
+            color: #999;
+            line-height: 1.6;
+        }
+
+        .bacronym-footer {
+            margin-top: 100px;
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(74, 144, 226, 0.15);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bacronym-catchcopy {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+            word-break: keep-all;
+        }
+
+        @media (max-width: 768px) {
+            .bacronym-initial {
+                font-size: 4rem;
+                width: 60px;
+            }
+
+            .bacronym-content {
+                margin-left: 20px;
+                padding-left: 20px;
+            }
+
+            .bacronym-list::before {
+                left: 45px;
+            }
+
+            .bacronym-catchcopy {
+                font-size: 1.2rem;
+            }
+        }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -266,6 +449,86 @@
                 </div>
             </div>
         </div>
+
+        <!-- AxelOn Bacronym Section -->
+        <section class="bacronym-section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="section-title">Identity</h2>
+                </div>
+
+                <div class="bacronym-container">
+                    <div class="bacronym-list">
+                        <!-- A -->
+                        <div class="bacronym-item">
+                            <div class="bacronym-initial">A</div>
+                            <div class="bacronym-content">
+                                <span class="bacronym-meaning">Axis / 軸</span>
+                                <div class="bacronym-word">Axis</div>
+                                <p class="bacronym-desc">ブレない信念・基準を持ち、進むべき方向を定める中心的支柱。</p>
+                            </div>
+                        </div>
+
+                        <!-- X -->
+                        <div class="bacronym-item">
+                            <div class="bacronym-initial">X</div>
+                            <div class="bacronym-content">
+                                <span class="bacronym-meaning">Cross / 交点</span>
+                                <div class="bacronym-word">Cross</div>
+                                <p class="bacronym-desc">経営と現場、論理と感性。異なる要素が交わる場所から、真の価値を生み出す。</p>
+                            </div>
+                        </div>
+
+                        <!-- E -->
+                        <div class="bacronym-item">
+                            <div class="bacronym-initial">E</div>
+                            <div class="bacronym-content">
+                                <span class="bacronym-meaning">Empower / 湧活</span>
+                                <div class="bacronym-word">Empower</div>
+                                <p class="bacronym-desc">現場の人間に力を与え、自発的なエネルギーを湧き出させる。</p>
+                            </div>
+                        </div>
+
+                        <!-- L -->
+                        <div class="bacronym-item">
+                            <div class="bacronym-initial">L</div>
+                            <div class="bacronym-content">
+                                <span class="bacronym-meaning">Link / 絆</span>
+                                <div class="bacronym-word">Link</div>
+                                <p class="bacronym-desc">地域、人、そして未来。途切れることのない強固な繋がりをデザインする。</p>
+                            </div>
+                        </div>
+
+                        <!-- O -->
+                        <div class="bacronym-item">
+                            <div class="bacronym-initial">O</div>
+                            <div class="bacronym-content">
+                                <span class="bacronym-meaning">On / 点火・恩</span>
+                                <div class="bacronym-word">On</div>
+                                <p class="bacronym-desc">やる気スイッチを入れ、受けた恩を原動力に変えて、情熱を燃やす。</p>
+                            </div>
+                        </div>
+
+                        <!-- N -->
+                        <div class="bacronym-item">
+                            <div class="bacronym-initial">N</div>
+                            <div class="bacronym-content">
+                                <span class="bacronym-meaning">Next / 次へ</span>
+                                <div class="bacronym-word">Next</div>
+                                <p class="bacronym-desc">現状に満足せず、常に一つ上のステージへ挑戦し続ける。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bacronym-footer animate-box">
+                        <p class="bacronym-catchcopy">
+                            軸を持ち、現場と交わり、人を活気づけ、<br>
+                            地域と絆を結び、恩を胸に点火して、次へ。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <div class="text-center">
             <h2 class="section-title">Services</h2>
@@ -802,6 +1065,25 @@
             // Enterキーで送信
             document.getElementById('chat-input').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') sendMessage();
+            });
+
+            // Intersection Observer for Bacronym Animation
+            document.addEventListener('DOMContentLoaded', () => {
+                const observerOptions = {
+                    threshold: 0.1
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, observerOptions);
+
+                document.querySelectorAll('.bacronym-item').forEach(item => {
+                    observer.observe(item);
+                });
             });
         </script>
 </body>
