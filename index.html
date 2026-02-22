@@ -276,16 +276,17 @@
             content: '';
             position: absolute;
             left: 60px;
-            top: 40px;
-            bottom: 40px;
+            top: 60px;
+            bottom: 60px;
             width: 1px;
-            background: linear-gradient(to bottom, transparent, rgba(74, 144, 226, 0.5), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(74, 144, 226, 0.3), transparent);
         }
 
         .bacronym-item {
             display: flex;
             align-items: center;
-            margin-bottom: 60px;
+            margin-bottom: 120px;
+            /* 余白の美：間隔を広げる */
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -363,26 +364,38 @@
             line-height: 1.6;
         }
 
+        /* 情緒的強調：彩度を調整したアクセント */
+        .text-accent-subtle {
+            color: #7ab1ef;
+            font-weight: 500;
+        }
+
         .bacronym-footer {
-            margin-top: 100px;
+            margin-top: 150px;
+            margin-bottom: 80px;
             text-align: center;
-            padding: 60px 40px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(74, 144, 226, 0.15);
-            border-radius: 24px;
-            backdrop-filter: blur(10px);
+            padding: 120px 0;
+            /* ネガティブスペースの確保 */
+            background: transparent;
+            /* 引き算：背景削除 */
+            border: none;
+            /* 引き算：枠線削除 */
             position: relative;
-            overflow: hidden;
         }
 
         .bacronym-catchcopy {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #ffffff;
-            line-height: 1.8;
+            font-size: 1.25rem;
+            /* サイズを控えめに */
+            font-weight: 400;
+            color: #E0E0E0;
+            /* グレーがかった白で品格を出す */
+            line-height: 2.2;
+            letter-spacing: 0.25em;
+            /* 文字間隔を広げ高級感を演出 */
             position: relative;
             z-index: 1;
             word-break: keep-all;
+            opacity: 0.9;
         }
 
         @media (max-width: 768px) {
@@ -505,7 +518,9 @@
                             <div class="bacronym-content">
                                 <span class="bacronym-meaning">On / 点火・恩</span>
                                 <div class="bacronym-word">On</div>
-                                <p class="bacronym-desc">やる気スイッチを入れ、受けた恩を原動力に変えて、情熱を燃やす。</p>
+                                <p class="bacronym-desc">やる気スイッチを入れ、受けた<span
+                                        class="text-accent-subtle">恩</span>を原動力に変えて、<span
+                                        class="text-accent-subtle">情熱</span>を燃やす。</p>
                             </div>
                         </div>
 
