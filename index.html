@@ -232,33 +232,6 @@
             border-top: 1px solid #222;
         }
 
-        .bacronym-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image:
-                linear-gradient(rgba(74, 144, 226, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(74, 144, 226, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
-        }
-
-        .bacronym-section::after {
-            content: '';
-            position: absolute;
-            bottom: -150px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            height: 400px;
-            background: radial-gradient(circle, rgba(74, 144, 226, 0.08) 0%, transparent 70%);
-            filter: blur(100px);
-            pointer-events: none;
-        }
-
         .bacronym-container {
             position: relative;
             z-index: 1;
@@ -346,7 +319,6 @@
             font-weight: 800;
             color: #ffffff;
             margin-bottom: 4px;
-            letter-spacing: 0.1em;
             text-transform: uppercase;
         }
 
@@ -390,8 +362,6 @@
             color: #E0E0E0;
             /* グレーがかった白で品格を出す */
             line-height: 2.2;
-            letter-spacing: 0.25em;
-            /* 文字間隔を広げ高級感を演出 */
             position: relative;
             z-index: 1;
             word-break: keep-all;
