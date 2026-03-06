@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>爆走！CB400SF - 障害物（レガシー）を飛び越えろ！</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Noto+Sans+JP:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111111;
+            color: #ffffff;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            touch-action: none;
+            /* スマホでのスワイプや拡縮を防止 */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            max-height: 500px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #111111;
+        }
+
+        #uiLayer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .screen {
+            background: rgba(17, 17, 17, 0.95);
+            padding: 30px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(230, 0, 18, 0.4);
+            text-align: center;
+            pointer-events: auto;
+            box-shadow: 0 0 30px rgba(230, 0, 18, 0.2);
+            backdrop-filter: blur(5px);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', 'Noto Sans JP', sans-serif;
+            font-size: 24px;
+            color: #E60012;
+            text-shadow: 0 0 15px rgba(230, 0, 18, 0.7);
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            color: #E60012;
+            text-shadow: 0 0 20px rgba(230, 0, 18, 0.9);
+            margin: 0 0 10px 0;
+            letter-spacing: 4px;
+        }
+
+        .score-display {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 22px;
+            color: #d4af37;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            font-weight: bold;
+        }
+
+        .score-display span {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+        }
+
+        p {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: #cccccc;
+            word-break: keep-all;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 5px;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37, #b5952f);
+            color: #111;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+        }
+
+        .btn-blue {
+            background: transparent;
+            color: #4a90e2;
+            border: 2px solid #4a90e2;
+        }
+
+        .btn-blue:hover {
+            background: rgba(74, 144, 226, 0.1);
+            transform: translateY(-2px);
+        }
+
+        #scoreBoard {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 18px;
+            color: #E60012;
+            text-shadow: 0 0 10px rgba(230, 0, 18, 0.5);
+            font-weight: bold;
+        }
+
+        #scoreBoard span {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: #d4af37;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+            margin: 0 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="scoreBoard" class="hidden">コスト削減: <span id="currentScore">0</span> 万円</div>
+
+        <div id="uiLayer">
+            <!-- Start Screen -->
+            <div id="startScreen" class="screen">
+                <h1>爆走！CB400SF</h1>
+                <p style="color:#d4af37; font-weight:bold; margin-bottom:15px; font-size:18px;">障害物（レガシー）を飛び越えろ！</p>
+                <p style="font-size: 13px; color: #888;">画面タップ（スマホ） または Spaceキー（PC）でジャンプ</p>
+                <button class="btn btn-gold" onclick="startGame()">▶ ENGINE START</button>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="gameOverScreen" class="screen hidden">
+                <h2>CRASH!</h2>
+                <div class="score-display">最終コスト削減額<br><span>0</span> 万円</div>
+                <p>古い商習慣（レガシー）にぶつかりました。<br>あなたの会社のDXも、AxelOnで加速（点火）させませんか？</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="https://axelon.co.jp" class="btn btn-gold">AI隼也に相談する（公式サイトへ）</a>
+                    <button class="btn btn-blue" onclick="startGame()">もう一度走る</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const scoreBoard = document.getElementById('scoreBoard');
+        const currentScoreEl = document.getElementById('currentScore');
+        const finalScoreEl = document.querySelector('#gameOverScreen .score-display span');
+
+        let GAME_WIDTH = 800;
+        let GAME_HEIGHT = 500;
+
+        // Game State
+        let isPlaying = false;
+        let animationId;
+        let score = 0;
+        let gameSpeed = 5;
+        let frames = 0;
+
+        // Resize observer to handle responsive canvas
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            // Allow full screen on mobile if no container max-width prevents it
+            GAME_WIDTH = window.innerWidth > 800 ? 800 : window.innerWidth;
+            GAME_HEIGHT = window.innerHeight > 500 ? 500 : window.innerHeight;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = GAME_WIDTH * dpr;
+            canvas.height = GAME_HEIGHT * dpr;
+            ctx.scale(dpr, dpr);
+
+            // Adjust ground height
+            ground.y = GAME_HEIGHT - 60;
+            player.baseY = ground.y - player.height;
+            if (!player.jumping) {
+                player.y = player.baseY;
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Ground object
+        const ground = {
+            y: 0,
+            draw: function () {
+                ctx.beginPath();
+                ctx.moveTo(0, this.y);
+                ctx.lineTo(GAME_WIDTH, this.y);
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#E60012';
+                ctx.shadowColor = '#E60012';
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                ctx.shadowBlur = 0; // reset
+            }
+        };
+
+        // Player (CB400SF Emoji)
+        const player = {
+            x: 60,
+            y: 0,
+            width: 45,
+            height: 45,
+            baseY: 0,
+            dy: 0,
+            jumpForce: 16,
+            gravity: 1.0,
+            jumping: false,
+
+            draw: function () {
+                ctx.font = '50px sans-serif'; // Bigger bike
+                ctx.textBaseline = 'bottom';
+
+                // Slight vertical bobbing effect for engine vibration
+                const bob = this.jumping ? 0 : Math.sin(frames * 0.4) * 2;
+
+                // Draw bike
+                ctx.fillText('🏍️', this.x, this.y + this.height + bob);
+
+                // Draw Speed lines/Exhaust randomly if grounded
+                if (!this.jumping) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    const exhaustY = this.y + this.height - 10 + bob;
+                    ctx.moveTo(this.x - 5, exhaustY);
+                    ctx.lineTo(this.x - 5 - Math.random() * 30, exhaustY + (Math.random() - 0.5) * 5);
+                    ctx.stroke();
+                }
+            },
+
+            update: function () {
+                if (this.jumping) {
+                    this.dy += this.gravity;
+                    this.y += this.dy;
+
+                    if (this.y >= this.baseY) {
+                        this.y = this.baseY;
+                        this.jumping = false;
+                        this.dy = 0;
+                    }
+                }
+                this.draw();
+            },
+
+            jump: function () {
+                if (!this.jumping) {
+                    this.jumping = true;
+                    this.dy = -this.jumpForce;
+                }
+            }
+        };
+
+        // Obstacles (Legacies)
+        const obstacleTypes = ['📄', '💮', '🏦'];
+        const obstacles = [];
+
+        class Obstacle {
+            constructor() {
+                this.width = 40;
+                this.height = 40;
+                this.x = GAME_WIDTH + 50;
+                this.y = ground.y - this.height;
+                this.type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+                this.passed = false;
+            }
+
+            draw() {
+                ctx.font = '40px sans-serif';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(this.type, this.x, this.y + this.height);
+            }
+
+            update() {
+                this.x -= gameSpeed;
+                this.draw();
+            }
+        }
+
+        // Particles for crash
+        const particles = [];
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 6 + 2;
+                this.speedX = (Math.random() - 0.5) * 15;
+                this.speedY = (Math.random() - 1) * 15;
+                // Red or Gold particles
+                this.color = Math.random() > 0.5 ? '#E60012' : '#d4af37';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += 0.6; // gravity
+                this.size *= 0.94; // shrink
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function handleObstacles() {
+            // Spawn logic: Frequency increases with game speed, but ensure minimum gap
+            const baseSpawnRate = Math.max(50, 120 - gameSpeed * 4);
+
+            if (frames % Math.floor(baseSpawnRate) === 0 && frames > 30) {
+                // Ensure they don't spawn too close to the previous one
+                let safeToSpawn = true;
+                if (obstacles.length > 0) {
+                    const lastOb = obstacles[obstacles.length - 1];
+                    const minGap = 250 + (gameSpeed * 10); // Gap widens as speed increases to allow jumping
+                    if (GAME_WIDTH - lastOb.x < minGap) safeToSpawn = false;
+                }
+
+                // Add some randomness to spawning so it's not a perfectly fixed rhythm
+                if (safeToSpawn && Math.random() > 0.2) {
+                    obstacles.push(new Obstacle());
+                }
+            }
+
+            for (let i = 0; i < obstacles.length; i++) {
+                obstacles[i].update();
+
+                // Score evaluation when passing an obstacle
+                if (!obstacles[i].passed && obstacles[i].x + obstacles[i].width < player.x) {
+                    score += 150; // Big bonus for jumping legacy
+                    obstacles[i].passed = true;
+                }
+
+                // Collision detection (AABB - slightly forgiving bounding box)
+                const paddingX = 15;
+                const paddingY = 15;
+                if (player.x + paddingX < obstacles[i].x + obstacles[i].width &&
+                    player.x + player.width - paddingX > obstacles[i].x &&
+                    player.y + paddingY < obstacles[i].y + obstacles[i].height &&
+                    player.height + player.y - paddingY > obstacles[i].y) {
+                    // CRASH
+                    gameOver();
+                }
+
+                // Remove off-screen obstacles
+                if (obstacles[i].x + obstacles[i].width < -50) {
+                    obstacles.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function triggerCrashParticles(x, y) {
+            particles.length = 0; // clear old
+            for (let i = 0; i < 40; i++) {
+                particles.push(new Particle(x, y));
+            }
+        }
+
+        function drawCyberBackground() {
+            // Speed Lines giving sense of motion
+            ctx.strokeStyle = 'rgba(74, 144, 226, 0.15)'; // Blue tint for lines
+            ctx.lineWidth = 2;
+
+            for (let i = 0; i < 4; i++) {
+                const lineY = (ground.y / 5) * (i + 1);
+                const lineLen = 150 + i * 50;
+                // Move with game speed = parallax effect
+                const lineX = GAME_WIDTH - ((frames * gameSpeed * (0.2 + i * 0.1)) % (GAME_WIDTH + lineLen));
+                ctx.beginPath();
+                ctx.moveTo(lineX, lineY);
+                ctx.lineTo(lineX + lineLen, lineY);
+                ctx.stroke();
+            }
+
+            // Grid lines on ground
+            ctx.strokeStyle = 'rgba(230, 0, 18, 0.2)';
+            for (let i = 0; i < GAME_WIDTH; i += 100) {
+                const gridX = (i - ((frames * gameSpeed) % 100));
+                ctx.beginPath();
+                ctx.moveTo(gridX, ground.y);
+                ctx.lineTo(gridX - 50, GAME_HEIGHT);
+                ctx.stroke();
+            }
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+            drawCyberBackground();
+            ground.draw();
+            player.update();
+            handleObstacles();
+
+            // Base score increment over time (running creates value)
+            if (frames % 5 === 0) {
+                score += 1;
+            }
+            currentScoreEl.innerText = score.toLocaleString();
+
+            // Speed up progressively
+            if (frames > 0 && frames % 600 === 0 && gameSpeed < 20) {
+                gameSpeed += 1.5;
+            }
+
+            frames++;
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            cancelAnimationFrame(animationId);
+
+            // Trigger explosion at player position
+            triggerCrashParticles(player.x + player.width / 2, player.y + player.height / 2);
+
+            // Death animation loop
+            function crashAnimation() {
+                ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+                drawCyberBackground();
+                ground.draw();
+
+                for (let ob of obstacles) ob.draw();
+
+                // Draw rotating/falling player
+                ctx.save();
+                ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+                ctx.rotate(Math.PI / 3); // Tilted
+                ctx.font = '50px sans-serif';
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center';
+                ctx.fillText('🏍️', 0, 0);
+                // "X" for crashed eye if desired, but emoji handles it
+                ctx.restore();
+
+                // Draw particles
+                let activeParticles = false;
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (particles[i].size > 0.5) activeParticles = true;
+                }
+
+                if (activeParticles) {
+                    requestAnimationFrame(crashAnimation);
+                } else {
+                    // Show Game Over UI
+                    finalScoreEl.innerText = score.toLocaleString();
+                    gameOverScreen.classList.remove('hidden');
+                    scoreBoard.classList.add('hidden');
+                }
+            }
+            crashAnimation();
+        }
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            scoreBoard.classList.remove('hidden');
+
+            // Reset state
+            obstacles.length = 0;
+            particles.length = 0;
+            score = 0;
+            frames = 0;
+            gameSpeed = 6;
+
+            resizeCanvas(); // Ensure initial sizing is right
+            player.y = player.baseY;
+            player.dy = 0;
+            player.jumping = false;
+
+            isPlaying = true;
+            animate();
+        }
+
+        // --- Input Handling ---
+        function inputJump(e) {
+            // Only space char for keydown
+            if (e.type === 'keydown' && e.code !== 'Space') return;
+
+            // Prevent default zooming/scrolling on space or touch
+            if (e.type !== 'mousedown') e.preventDefault();
+
+            if (isPlaying && !player.jumping) {
+                player.jump();
+            }
+        }
+
+        // Attach events
+        window.addEventListener('keydown', inputJump, { passive: false });
+        canvas.addEventListener('touchstart', inputJump, { passive: false });
+        canvas.addEventListener('mousedown', inputJump, { passive: false });
+
+        // Block double tap zoom on iOS
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Initial setup
+        resizeCanvas();
+        ground.draw();
+
+    </script>
+</body>
+
+</html>
