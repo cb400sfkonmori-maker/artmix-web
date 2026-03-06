@@ -870,9 +870,66 @@
                 <div class="col-md-6">
                     <div class="row align-items-center">
                         <div class="col-12 text-center mb-4">
-                            <img src="conrod.jpg" alt="T. Komori"
-                                class="img-fluid rounded-circle border border-2 border-secondary shadow-lg"
-                                style="width: 140px; height: 140px; object-fit: cover; filter: grayscale(100%);">
+                            <style>
+                                .komori-easter-egg {
+                                    display: inline-block;
+                                    position: relative;
+                                    text-decoration: none;
+                                }
+
+                                .komori-easter-egg img {
+                                    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+                                }
+
+                                .komori-easter-egg:hover img {
+                                    transform: scale(1.05);
+                                    box-shadow: 0 0 25px rgba(212, 175, 55, 0.6) !important;
+                                    border-color: #d4af37 !important;
+                                }
+
+                                .komori-tooltip {
+                                    position: absolute;
+                                    bottom: -20px;
+                                    left: 50%;
+                                    transform: translateX(-50%) translateY(15px);
+                                    background: rgba(212, 175, 55, 0.95);
+                                    color: #111;
+                                    padding: 6px 18px;
+                                    border-radius: 20px;
+                                    font-size: 0.9rem;
+                                    font-weight: bold;
+                                    white-space: nowrap;
+                                    opacity: 0;
+                                    visibility: hidden;
+                                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                                    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.5);
+                                    pointer-events: none;
+                                    z-index: 10;
+                                }
+
+                                .komori-tooltip::before {
+                                    content: '';
+                                    position: absolute;
+                                    top: -6px;
+                                    left: 50%;
+                                    transform: translateX(-50%);
+                                    border-width: 0 6px 6px 6px;
+                                    border-style: solid;
+                                    border-color: transparent transparent rgba(212, 175, 55, 0.95) transparent;
+                                }
+
+                                .komori-easter-egg:hover .komori-tooltip {
+                                    opacity: 1;
+                                    visibility: visible;
+                                    transform: translateX(-50%) translateY(0);
+                                }
+                            </style>
+                            <a href="t-komori-game.html" class="komori-easter-egg">
+                                <img src="conrod.jpg" alt="T. Komori"
+                                    class="img-fluid rounded-circle border border-2 border-secondary shadow-lg"
+                                    style="width: 140px; height: 140px; object-fit: cover; filter: grayscale(100%);">
+                                <span class="komori-tooltip"><i class="fas fa-golf-ball me-1"></i>ナイスショット！</span>
+                            </a>
                         </div>
                         <div class="col-12 text-center text-md-start">
                             <h6 class="text-secondary mb-2" style="letter-spacing: 2px;">TECHNICAL ADVISOR / 最高技術顧問</h6>
