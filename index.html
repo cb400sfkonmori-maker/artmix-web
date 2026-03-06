@@ -950,12 +950,68 @@
                 <div class="col-md-12 mt-5 pt-5 border-top border-secondary">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-4 text-center mb-4">
-                            <!-- K.Saori アート画像 -->
-                            <div class="mx-auto rounded-circle border border-2 shadow-lg"
-                                style="width: 140px; height: 140px; border-color: #9b59b6 !important; overflow: hidden; display: flex; justify-content: center; align-items: center;">
-                                <img src="saori-art.jpg" alt="K.Saori Art"
-                                    style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.8);">
-                            </div>
+                            <style>
+                                .saori-easter-egg {
+                                    display: inline-block;
+                                    position: relative;
+                                    text-decoration: none;
+                                }
+
+                                .saori-easter-egg .image-container {
+                                    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+                                }
+
+                                .saori-easter-egg:hover .image-container {
+                                    transform: scale(1.05);
+                                    box-shadow: 0 0 30px rgba(155, 89, 182, 0.7) !important;
+                                    border-color: #d8b4fe !important;
+                                }
+
+                                .saori-tooltip {
+                                    position: absolute;
+                                    bottom: -20px;
+                                    left: 50%;
+                                    transform: translateX(-50%) translateY(15px);
+                                    background: rgba(155, 89, 182, 0.95);
+                                    color: white;
+                                    padding: 6px 18px;
+                                    border-radius: 20px;
+                                    font-size: 0.9rem;
+                                    font-weight: bold;
+                                    white-space: nowrap;
+                                    opacity: 0;
+                                    visibility: hidden;
+                                    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                                    box-shadow: 0 5px 15px rgba(155, 89, 182, 0.5);
+                                    pointer-events: none;
+                                    z-index: 10;
+                                }
+
+                                .saori-tooltip::before {
+                                    content: '';
+                                    position: absolute;
+                                    top: -6px;
+                                    left: 50%;
+                                    transform: translateX(-50%);
+                                    border-width: 0 6px 6px 6px;
+                                    border-style: solid;
+                                    border-color: transparent transparent rgba(155, 89, 182, 0.95) transparent;
+                                }
+
+                                .saori-easter-egg:hover .saori-tooltip {
+                                    opacity: 1;
+                                    visibility: visible;
+                                    transform: translateX(-50%) translateY(0);
+                                }
+                            </style>
+                            <a href="k-saori-game.html" class="saori-easter-egg">
+                                <div class="image-container mx-auto rounded-circle border border-2 shadow-lg"
+                                    style="width: 140px; height: 140px; border-color: #9b59b6 !important; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                                    <img src="saori-art.jpg" alt="K.Saori Art"
+                                        style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.8);">
+                                </div>
+                                <span class="saori-tooltip"><i class="fas fa-magic me-1"></i>スパークルアートを爆発！</span>
+                            </a>
                         </div>
                         <div class="col-12 col-md-8 text-center text-md-start">
                             <h6 class="mb-2" style="letter-spacing: 2px; color: #d8b4fe;">CHIEF ART OFFICER /

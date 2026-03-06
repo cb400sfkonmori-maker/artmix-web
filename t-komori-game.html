@@ -61,21 +61,22 @@
     <div class="canvas-wrapper">
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Modal -->
-        <div id="modal"
-            class="absolute inset-0 bg-black/85 backdrop-blur-sm z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 p-6 text-center">
-            <h3 id="modalTitle" class="text-4xl font-bold mb-4 font-['Orbitron']">RESULT</h3>
-            <p id="modalDesc" class="text-gray-300 mb-8 leading-relaxed max-w-md"></p>
+    </div>
 
-            <a href="https://axelon.co.jp"
-                class="bg-gradient-to-r from-[#d4af37] to-[#b5952f] text-black font-bold py-4 px-10 rounded-full gold-glow hover:scale-105 transition-transform mb-5">
-                <i class="fas fa-chess-knight mr-2"></i> AI顧問へ相談する
-            </a>
-            <button id="retryBtn"
-                class="text-[#4a90e2] border-2 border-[#4a90e2] px-8 py-2 rounded-full hover:bg-[#4a90e2]/10 transition-colors font-bold">
-                もう一度挑戦する
-            </button>
-        </div>
+    <!-- Modal (Moved out of canvas-wrapper for full screen overlay) -->
+    <div id="modal"
+        class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 p-4 sm:p-6 text-center w-full h-full overflow-y-auto">
+        <h3 id="modalTitle" class="text-3xl md:text-4xl font-bold mb-3 font-['Orbitron']">RESULT</h3>
+        <p id="modalDesc" class="text-sm md:text-base text-gray-300 mb-6 leading-relaxed max-w-md"></p>
+
+        <a href="https://axelon.co.jp"
+            class="bg-gradient-to-r from-[#d4af37] to-[#b5952f] text-black font-bold py-3 px-6 md:py-4 md:px-10 rounded-full gold-glow hover:scale-105 transition-transform mb-4 w-full max-w-[320px]">
+            <i class="fas fa-chess-knight mr-2"></i> AI顧問へ相談する
+        </a>
+        <button id="retryBtn"
+            class="text-[#4a90e2] border-2 border-[#4a90e2] px-6 py-2 rounded-full hover:bg-[#4a90e2]/10 transition-colors font-bold w-full max-w-[280px]">
+            もう一度挑戦する
+        </button>
     </div>
 
     <p class="mt-6 text-gray-500 text-sm"><i class="fas fa-mouse-pointer mr-1"></i> 画面タップ / クリックでパワー決定</p>
@@ -197,11 +198,11 @@
             state = 'END';
             if (isWin) {
                 modalTitle.innerText = 'ナイスショット！';
-                modalTitle.className = "text-4xl font-bold mb-4 font-['Orbitron'] text-[#d4af37] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]";
+                modalTitle.className = "text-3xl md:text-4xl font-bold mb-3 font-['Orbitron'] text-[#d4af37] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]";
                 modalDesc.innerText = '0.01ミリの精度で到達しました。\n次なる事業変革は、AxelOnにご相談ください。';
             } else {
                 modalTitle.innerText = 'CRASH...';
-                modalTitle.className = "text-4xl font-bold mb-4 font-['Orbitron'] text-[#E60012] drop-shadow-[0_0_15px_rgba(230,0,18,0.8)]";
+                modalTitle.className = "text-3xl md:text-4xl font-bold mb-3 font-['Orbitron'] text-[#E60012] drop-shadow-[0_0_15px_rgba(230,0,18,0.8)]";
                 modalDesc.innerText = msg + '\n\n古い商習慣に捕まりましたか？ 御社のDXと利益改善は、AxelOnにご相談ください。';
             }
             modal.classList.remove('opacity-0', 'pointer-events-none');
