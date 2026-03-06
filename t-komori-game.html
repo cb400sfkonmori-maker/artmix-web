@@ -219,14 +219,23 @@
                 ball.x += ball.vx;
                 ball.y += ball.vy;
 
+                // Subtle magnetic pull (slope) if the ball lands just before or after the cup
+                if (ball.y >= groundY - ball.radius - 5) {
+                    if (ball.x > cup.x - 40 && ball.x <= cup.x) {
+                        ball.vx += 0.15; // Roll towards cup from left
+                    } else if (ball.x >= cup.x + cup.w && ball.x < cup.x + cup.w + 20) {
+                        ball.vx -= 0.15; // Roll back towards cup from right
+                    }
+                }
+
                 // Check Cup and Ground
-                const inCupX = ball.x > cup.x && ball.x < cup.x + cup.w;
+                const inCupX = ball.x > cup.x + 2 && ball.x < cup.x + cup.w - 2;
 
                 if (inCupX) {
                     if (ball.y >= groundY - ball.radius) {
-                        ball.vx *= 0.5; // Strong friction inside hole to prevent it rolling out
+                        ball.vx *= 0.2; // Strong friction inside hole to drop straight down
                     }
-                    if (ball.y > groundY + 30) {
+                    if (ball.y > groundY + 10) {
                         ball.vx = 0; ball.vy = 0;
                         if (state !== 'WAIT') {
                             state = 'WAIT';
@@ -257,8 +266,8 @@
                 if (state === 'ROLL') {
                     if (ball.x > GAME_WIDTH + 10 || ball.x < -10) {
                         state = 'WAIT';
-                        setTimeout(() => endGame(false, 'カップを大きく外れました。'), 200);
-                    } else if (Math.abs(ball.vx) < 0.1 && Math.abs(ball.vy) < 0.1 && ball.y >= groundY - ball.radius - 1) {
+                        setTimeout(() => endGame(false, 'グリーンをオーバーしました。'), 200);
+                    } else if (!inCupX && Math.abs(ball.vx) < 0.05 && Math.abs(ball.vy) < 0.1 && ball.y >= groundY - ball.radius - 1) {
                         state = 'WAIT';
                         setTimeout(() => endGame(false, 'カップに届きませんでした。'), 200);
                     }
