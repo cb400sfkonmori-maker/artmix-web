@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>F1エンジニアの執念：0.01ミリのパット</title>
+    <title>F1エンジニアの執念：0.01ミリのショット</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Noto+Sans+JP:wght@400;700;900&display=swap"
@@ -54,7 +54,7 @@
             AxelOn</h1>
         <h2 class="text-lg md:text-xl font-bold text-white tracking-widest">
             <span class="text-[#d4af37]">T.Komori</span> 最高技術顧問からの挑戦状
-            <span class="text-sm text-gray-400 mt-2 block">F1エンジニアの執念：0.01ミリのパット</span>
+            <span class="text-sm text-gray-400 mt-2 block">F1エンジニアの執念：0.01ミリのショット</span>
         </h2>
     </div>
 
@@ -94,7 +94,7 @@
         canvas.height = GAME_HEIGHT;
 
         const groundY = 380;
-        const cup = { x: 740, w: 25 };
+        const cup = { x: 735, w: 35 };
 
         let ball = { x: 50, y: groundY - 6, radius: 6, vx: 0, vy: 0 };
         let power = 0;
@@ -185,9 +185,9 @@
             ctx.strokeStyle = '#444';
             ctx.strokeRect(meterX, meterY, meterW, meterH);
 
-            // Sweet spot indicator (approx 78% ~ 88%)
+            // Sweet spot indicator (approx 74% ~ 88%)
             ctx.fillStyle = 'rgba(212, 175, 55, 0.3)';
-            ctx.fillRect(meterX + meterW * 0.77, meterY, meterW * 0.12, meterH);
+            ctx.fillRect(meterX + meterW * 0.74, meterY, meterW * 0.14, meterH);
 
             ctx.fillStyle = '#E60012';
             ctx.fillRect(meterX, meterY, meterW * (power / 100), meterH);
@@ -196,7 +196,7 @@
         function endGame(isWin, msg) {
             state = 'END';
             if (isWin) {
-                modalTitle.innerText = 'MISSION CLEAR';
+                modalTitle.innerText = 'ナイスショット！';
                 modalTitle.className = "text-4xl font-bold mb-4 font-['Orbitron'] text-[#d4af37] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]";
                 modalDesc.innerText = '0.01ミリの精度で到達しました。\n次なる事業変革は、AxelOnにご相談ください。';
             } else {
@@ -219,14 +219,18 @@
                 ball.x += ball.vx;
                 ball.y += ball.vy;
 
-                // Check Cup
-                if (ball.x > cup.x && ball.x < cup.x + cup.w) {
-                    if (ball.y >= groundY) {
-                        ball.vx *= 0.7; // friction inside cup
-                        if (ball.y > groundY + 40) {
-                            ball.vx = 0; ball.vy = 0;
+                // Check Cup and Ground
+                const inCupX = ball.x > cup.x && ball.x < cup.x + cup.w;
+
+                if (inCupX) {
+                    if (ball.y >= groundY - ball.radius) {
+                        ball.vx *= 0.5; // Strong friction inside hole to prevent it rolling out
+                    }
+                    if (ball.y > groundY + 30) {
+                        ball.vx = 0; ball.vy = 0;
+                        if (state !== 'WAIT') {
                             state = 'WAIT';
-                            setTimeout(() => endGame(true), 400);
+                            setTimeout(() => endGame(true), 200);
                         }
                     }
                 } else {
