@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ハウスメーカー向け AIコンシェルジュ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#4a90e2',    /* AxelOn Blue */
+                            ishidaya: '#1e3a8a', /* 濃いブルー・ネイビー系（石田屋カラー想定） */
+                            dark: '#0f172a',    /* 深夜の寝室に合う落ち着いたダーク背景 */
+                            card: '#1e293b',
+                            userBubble: '#059669', /* LINE風の緑（または青） */
+                            aiBubble: '#334155'    /* AI側のグレー */
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in-up': 'fadeInUp 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #0f172a; /* 深夜の寝室に配慮したダーク背景 */
+            color: #f8fafc;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow: hidden; /* スマホでのスクロールバウンス防止 */
+            overscroll-behavior-y: none;
+        }
+
+        /* カスタムスクロールバー（スマホでは基本的に見えないがPC確認用） */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        /* チャットエリアのスクロール設定 */
+        #chat-container {
+            scroll-behavior: smooth;
+        }
+
+        /* メッセージの表示アニメーション */
+        .message-anim {
+            opacity: 0;
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        /* 入力中インジケーターのドット */
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* 入力欄のフォーカス時のスタイル */
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.5);
+        }
+
+        /* ヘッダーの微妙なグラデーション */
+        .header-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col h-screen h-[100dvh]"> <!-- h-[100dvh]でスマホのブラウザUIバーを考慮 -->
+
+    <!-- Header -->
+    <header class="header-bg py-4 px-4 shadow-md flex items-center justify-between z-10 sticky top-0">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-white shadow-inner flex items-center justify-center overflow-hidden border-2 border-brand-ishidaya">
+                <!-- 石田屋ロゴプレースホルダー兼コンシェルジュアイコン -->
+                <i class="fas fa-home text-brand-ishidaya text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-white font-bold text-lg tracking-wide leading-tight">ハウスメーカー向け AIコンシェルジュ</h1>
+                <p class="text-brand-blue text-xs flex items-center gap-1 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    オンライン
+                </p>
+            </div>
+        </div>
+        <button class="text-gray-300 hover:text-white transition-colors p-2" aria-label="メニュー">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+    </header>
+
+    <!-- Chat Area -->
+    <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-6 relative bg-[#0f172a] bg-opacity-90 pb-20">
+        <!-- 背景装飾（邪魔にならない程度のロゴ透かし等に使えるエリア） -->
+        <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
+            <i class="fas fa-home text-9xl"></i>
+        </div>
+
+        <!-- Initial Welcome Message -->
+        <div class="flex items-end gap-2 message-anim w-full max-w-md">
+            <div class="w-8 h-8 rounded-full bg-white flex-shrink-0 flex items-center justify-center border border-gray-600 mb-1">
+                <i class="fas fa-robot text-brand-ishidaya text-sm"></i>
+            </div>
+            <div class="bg-brand-aiBubble text-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm text-sm sm:text-base leading-relaxed break-words">
+                こんばんは。ハウスメーカー向けAIコンシェルジュです。<br>
+                家づくりに関するご相談、お見積り、性能についてなど、何でもお気軽にご質問ください。<br>
+                （※深夜ですので、通知音は鳴りません。ご安心ください。）
+            </div>
+        </div>
+        <!-- タイムスタンプ（初回） -->
+        <div class="text-xs text-gray-500 ml-12 -mt-4 message-anim" id="initial-time"></div>
+
+    </main>
+
+    <!-- Typing Indicator (Hidden by default) -->
+    <div id="typing-indicator" class="hidden px-4 py-2 bg-transparent -mt-16 mb-16 z-10 w-full max-w-md">
+        <div class="flex items-end gap-2">
+            <div class="w-8 h-8 rounded-full bg-white flex-shrink-0 flex items-center justify-center border border-gray-600 mb-1">
+                <i class="fas fa-robot text-brand-ishidaya text-sm"></i>
+            </div>
+            <div class="bg-brand-aiBubble rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
+                <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <footer class="bg-brand-card border-t border-gray-800 p-3 sm:p-4 z-20">
+        <form id="chat-form" class="flex items-end gap-2 max-w-3xl mx-auto" onsubmit="handleSend(event)">
+            <!-- メニューボタン（＋） -->
+            <button type="button" class="text-gray-400 hover:text-white p-2 flex-shrink-0 transition-colors">
+                <i class="fas fa-plus-circle text-xl"></i>
+            </button>
+            
+            <!-- テキスト入力 -->
+            <div class="flex-1 bg-brand-dark border border-gray-700 rounded-2xl relative flex items-center">
+                <input type="text" id="user-input" 
+                    class="w-full bg-transparent text-white px-4 py-3 sm:py-3.5 rounded-2xl placeholder-gray-500 text-sm sm:text-base"
+                    placeholder="メッセージを入力..." autocomplete="off">
+            </div>
+
+            <!-- 送信ボタン -->
+            <button type="submit" id="send-btn" 
+                class="bg-brand-userBubble hover:bg-green-600 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-paper-plane text-sm sm:text-base -ml-1"></i>
+            </button>
+        </form>
+    </footer>
+
+    <script>
+        // デモ用ロジック (main.js 相当)
+        
+        let turnCounter = 0;
+        let isWaitingForAi = false;
+
+        // シナリオデータの定義
+        const scenario = [
+            `ご質問ありがとうございます！耐震性と光熱費対策、今の時代一番大切なポイントですよね。<br>
+弊社では、まさにその両方を備えた大人気モデルをご用意しております！<br>
+太陽光発電とダブル蓄電池を標準搭載しており、最新の耐震工法で【震度7の激震を100回連続で与える実験】もクリアしています。`,
+            
+            `35坪タイプで、本体価格2,450万円（税込2,695万円）となっております。<br>
+ちなみに現在（4/20まで）『春の家づくり 特別キャンペーン』を実施中で、食洗機などの豪華オプションを1つ無料でプレゼントしております。<br>
+高崎や前橋の展示場で、実際のモデルハウスをご覧になりませんか？`
+        ];
+
+        // 現在時刻をフォーマットする関数
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // 初期時刻の設定
+        document.getElementById('initial-time').innerText = getCurrentTime();
+
+        // チャット要素
+        const chatContainer = document.getElementById('chat-container');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const submitBtn = document.getElementById('send-btn');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        // 自動スクロール
+        function scrollToBottom() {
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // ユーザーのメッセージを追加
+        function addUserMessage(text) {
+            const time = getCurrentTime();
+            const html = `
+                <div class="flex flex-col items-end message-anim w-full ml-auto mt-4">
+                    <div class="bg-brand-userBubble text-white rounded-2xl rounded-br-sm px-4 py-3 shadow-md max-w-[85%] sm:max-w-[75%] break-words text-sm sm:text-base">
+                        ${escapeHTML(text)}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1 mr-1">既読 ${time}</div>
+                </div>
+            `;
+            chatContainer.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        // AIのメッセージを追加
+        function addAiMessage(text) {
+            const time = getCurrentTime();
+            const html = `
+                <div class="flex items-end gap-2 message-anim w-full max-w-[90%] sm:max-w-[85%] mt-4">
+                    <div class="w-8 h-8 rounded-full bg-white flex-shrink-0 flex items-center justify-center border border-gray-600 mb-1">
+                        <i class="fas fa-robot text-brand-ishidaya text-sm"></i>
+                    </div>
+                    <div class="bg-brand-aiBubble text-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm text-sm sm:text-base leading-relaxed break-words">
+                        ${text}
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 ml-12 mt-1 message-anim">${time}</div>
+            `;
+            chatContainer.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        // HTMLエスケープ処理（簡易版）
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // 送信処理
+        function handleSend(e) {
+            e.preventDefault();
+            
+            const text = userInput.value.trim();
+            if (!text || isWaitingForAi) return;
+
+            // ユーザー入力の処理
+            addUserMessage(text);
+            userInput.value = '';
+            
+            // UI状態の更新
+            isWaitingForAi = true;
+            submitBtn.disabled = true;
+            typingIndicator.classList.remove('hidden');
+            scrollToBottom();
+
+            // 1秒後にAIからの返答をシミュレート
+            setTimeout(() => {
+                // 返答文の決定
+                let replyText = "";
+                if (turnCounter < scenario.length) {
+                    replyText = scenario[turnCounter];
+                    turnCounter++;
+                } else {
+                    replyText = `申し訳ありません、現在のデモ版ではここまでしかお答えできません。<br>
+よろしければ、展示場のご予約や詳細な資料請求を承ります。<br>
+<a href="#" class="text-blue-400 underline mt-2 inline-block">展示場予約フォームへ進む</a>`;
+                }
+
+                // AIの返答を表示
+                typingIndicator.classList.add('hidden');
+                addAiMessage(replyText);
+                
+                // 状態リセット
+                isWaitingForAi = false;
+                submitBtn.disabled = false;
+                
+                // 次の入力のフォーカス（モバイルでキーボードが閉じないように。場合によっては不要）
+                // userInput.focus();
+
+            }, 1000); // 1秒のローディング
+        }
+
+        // プレースホルダーの入力テスト用：Enterキー対応はform submitで内包
+    </script>
+</body>
+</html>
