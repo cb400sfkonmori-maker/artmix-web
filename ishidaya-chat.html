@@ -48,7 +48,7 @@
             overscroll-behavior-y: none;
         }
 
-        /* カスタムスクロールバー（スマホでは基本的に見えないがPC確認用） */
+        /* カスタムスクロールバー */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -67,11 +67,10 @@
 
         /* メッセージの表示アニメーション */
         .message-anim {
-            opacity: 0;
-            animation: fadeInUp 0.4s ease-out forwards;
+            animation: myFadeInUp 0.4s ease-out forwards;
         }
 
-        @keyframes fadeInUp {
+        @keyframes myFadeInUp {
             0% { opacity: 0; transform: translateY(10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
@@ -107,7 +106,6 @@
     <header class="header-bg py-4 px-4 shadow-md flex items-center justify-between z-10 sticky top-0">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white shadow-inner flex items-center justify-center overflow-hidden border-2 border-brand-ishidaya">
-                <!-- 石田屋ロゴプレースホルダー兼コンシェルジュアイコン -->
                 <i class="fas fa-home text-brand-ishidaya text-xl"></i>
             </div>
             <div>
@@ -125,7 +123,7 @@
 
     <!-- Chat Area -->
     <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-6 relative bg-[#0f172a] bg-opacity-90 pb-20">
-        <!-- 背景装飾（邪魔にならない程度のロゴ透かし等に使えるエリア） -->
+        <!-- 背景装飾 -->
         <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none">
             <i class="fas fa-home text-9xl"></i>
         </div>
@@ -163,19 +161,16 @@
     <!-- Input Area -->
     <footer class="bg-brand-card border-t border-gray-800 p-3 sm:p-4 z-20">
         <form id="chat-form" class="flex items-end gap-2 max-w-3xl mx-auto" onsubmit="handleSend(event)">
-            <!-- メニューボタン（＋） -->
             <button type="button" class="text-gray-400 hover:text-white p-2 flex-shrink-0 transition-colors">
                 <i class="fas fa-plus-circle text-xl"></i>
             </button>
             
-            <!-- テキスト入力 -->
             <div class="flex-1 bg-brand-dark border border-gray-700 rounded-2xl relative flex items-center">
                 <input type="text" id="user-input" 
                     class="w-full bg-transparent text-white px-4 py-3 sm:py-3.5 rounded-2xl placeholder-gray-500 text-sm sm:text-base"
                     placeholder="メッセージを入力..." autocomplete="off">
             </div>
 
-            <!-- 送信ボタン -->
             <button type="submit" id="send-btn" 
                 class="bg-brand-userBubble hover:bg-green-600 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fas fa-paper-plane text-sm sm:text-base -ml-1"></i>
@@ -184,12 +179,9 @@
     </footer>
 
     <script>
-        // デモ用ロジック (main.js 相当)
-        
         let turnCounter = 0;
         let isWaitingForAi = false;
 
-        // シナリオデータの定義
         const scenario = [
             `ご質問ありがとうございます！耐震性と光熱費対策、今の時代一番大切なポイントですよね。<br>
 弊社では、まさにその両方を備えた大人気モデルをご用意しております！<br>
@@ -200,7 +192,6 @@
 高崎や前橋の展示場で、実際のモデルハウスをご覧になりませんか？`
         ];
 
-        // 現在時刻をフォーマットする関数
         function getCurrentTime() {
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
@@ -208,25 +199,26 @@
             return `${hours}:${minutes}`;
         }
 
-        // 初期時刻の設定
         document.getElementById('initial-time').innerText = getCurrentTime();
 
-        // チャット要素
         const chatContainer = document.getElementById('chat-container');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const submitBtn = document.getElementById('send-btn');
         const typingIndicator = document.getElementById('typing-indicator');
 
-        // 自動スクロール
         function scrollToBottom() {
-            chatContainer.scrollTo({
-                top: chatContainer.scrollHeight,
-                behavior: 'smooth'
-            });
+            try {
+                chatContainer.scrollTo({
+                    top: chatContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } catch (e) {
+                // `behavior: smooth` が非対応のブラウザ向けフォールバック
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
         }
 
-        // ユーザーのメッセージを追加
         function addUserMessage(text) {
             const time = getCurrentTime();
             const html = `
@@ -241,7 +233,6 @@
             scrollToBottom();
         }
 
-        // AIのメッセージを追加
         function addAiMessage(text) {
             const time = getCurrentTime();
             const html = `
@@ -259,39 +250,29 @@
             scrollToBottom();
         }
 
-        // HTMLエスケープ処理（簡易版）
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    "'": '&#39;',
-                    '"': '&quot;'
-                }[tag] || tag)
-            );
+            return str.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#39;');
         }
 
-        // 送信処理
         function handleSend(e) {
             e.preventDefault();
             
             const text = userInput.value.trim();
             if (!text || isWaitingForAi) return;
 
-            // ユーザー入力の処理
             addUserMessage(text);
             userInput.value = '';
             
-            // UI状態の更新
             isWaitingForAi = true;
             submitBtn.disabled = true;
-            typingIndicator.classList.remove('hidden');
+            if (typingIndicator) typingIndicator.classList.remove('hidden');
             scrollToBottom();
 
-            // 1秒後にAIからの返答をシミュレート
             setTimeout(() => {
-                // 返答文の決定
                 let replyText = "";
                 if (turnCounter < scenario.length) {
                     replyText = scenario[turnCounter];
@@ -302,21 +283,14 @@
 <a href="#" class="text-blue-400 underline mt-2 inline-block">展示場予約フォームへ進む</a>`;
                 }
 
-                // AIの返答を表示
-                typingIndicator.classList.add('hidden');
+                if (typingIndicator) typingIndicator.classList.add('hidden');
                 addAiMessage(replyText);
                 
-                // 状態リセット
                 isWaitingForAi = false;
                 submitBtn.disabled = false;
                 
-                // 次の入力のフォーカス（モバイルでキーボードが閉じないように。場合によっては不要）
-                // userInput.focus();
-
-            }, 1000); // 1秒のローディング
+            }, 1000);
         }
-
-        // プレースホルダーの入力テスト用：Enterキー対応はform submitで内包
     </script>
 </body>
 </html>
