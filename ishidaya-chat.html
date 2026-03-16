@@ -71,6 +71,11 @@
             animation: fadeInUp 0.4s ease-out forwards;
         }
 
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         /* 入力中インジケーターのドット */
         .typing-dot {
             animation: typing 1.4s infinite ease-in-out both;
