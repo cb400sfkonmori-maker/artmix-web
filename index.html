@@ -382,13 +382,211 @@
                 font-size: 1.2rem;
             }
         }
+
+        /* --- Global Hamburger Menu --- */
+        .nav-hamburger {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(74, 144, 226, 0.9);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2100;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-hamburger:hover {
+            transform: scale(1.1);
+            background: #4a90e2;
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.6);
+        }
+
+        .nav-hamburger span {
+            width: 25px;
+            height: 2px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .nav-hamburger.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .nav-hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-hamburger.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .side-nav {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100vh;
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 2050;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 100px 40px;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            border-left: 1px solid rgba(74, 144, 226, 0.2);
+        }
+
+        .side-nav.active {
+            right: 0;
+        }
+
+        .side-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .side-nav-item {
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: 0.4s;
+        }
+
+        .side-nav.active .side-nav-item {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .side-nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .side-nav-link:hover {
+            color: #4a90e2;
+            padding-left: 10px;
+        }
+
+        .side-nav-link i {
+            width: 25px;
+            text-align: center;
+            color: #4a90e2;
+            font-size: 1rem;
+        }
+
+        /* --- Card Specific Hamburger/Meatball Menu --- */
+        .card-menu-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #666;
+            cursor: pointer;
+            transition: 0.3s;
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            z-index: 5;
+        }
+
+        .card-menu-btn:hover {
+            color: #4a90e2;
+        }
+
+        .card-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 100;
+            min-width: 150px;
+            overflow: hidden;
+        }
+
+        .card-dropdown.show {
+            display: block;
+        }
+
+        .card-dropdown-item {
+            padding: 10px 15px;
+            color: #ddd;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .card-dropdown-item:hover {
+            background: #4a90e2;
+            color: white;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-    <div class="hero-section">
+    <!-- Global Hamburger Navigation -->
+    <button class="nav-hamburger" id="nav-hamburger" onclick="toggleNav()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <nav class="side-nav" id="side-nav">
+        <ul class="side-nav-list">
+            <li class="side-nav-item" style="transition-delay: 0.1s;">
+                <a href="#top" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-home"></i> TOP</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.15s;">
+                <a href="#services" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-gem"></i> PHILOSOPHY</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.2s;">
+                <a href="#identity" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-id-card"></i> IDENTITY</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.25s;">
+                <a href="#services-list" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-concierge-bell"></i> SERVICES</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.3s;">
+                <a href="#portfolio" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-briefcase"></i> PORTFOLIO</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.35s;">
+                <a href="#simulator" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-robot"></i> SIMULATOR</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.4s;">
+                <a href="#team" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-users"></i> TEAM</a>
+            </li>
+            <li class="side-nav-item" style="transition-delay: 0.45s;">
+                <a href="#contact" class="side-nav-link" onclick="toggleNav()"><i class="fas fa-envelope"></i> CONTACT</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="hero-section" id="top">
         <img src="hero-image.png" alt="AxelOn Hero Image" class="hero-bg-img">
         <div class="hero-overlay"></div>
         <div class="container">
@@ -427,7 +625,7 @@
         </div>
 
         <!-- AxelOn Bacronym Section -->
-        <section class="bacronym-section">
+        <section class="bacronym-section" id="identity">
             <div class="container">
                 <div class="text-center mb-5">
                     <h2 class="section-title">Identity</h2>
@@ -508,7 +706,7 @@
             </div>
         </section>
 
-        <div class="text-center">
+        <div class="text-center" id="services-list">
             <h2 class="section-title">Services</h2>
         </div>
 
@@ -559,7 +757,7 @@
             </div>
         </div>
 
-        <div class="text-center mt-5">
+        <div class="text-center mt-5" id="portfolio">
             <h2 class="section-title">Portfolio & Solutions</h2>
             <p class="mb-5 text-secondary">クライアントの課題を解決するために開発した、実際のツールとスキームです。</p>
 
@@ -567,6 +765,14 @@
 
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge bg-primary">App / Tool</span>
                         </div>
@@ -586,6 +792,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge bg-danger">Food / Consulting</span>
                         </div>
@@ -604,6 +818,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge bg-danger">Consulting</span>
                         </div>
@@ -623,6 +845,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge bg-success">Risk Management</span>
                         </div>
@@ -643,6 +873,14 @@
 
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge bg-warning text-dark">Recruit / Web</span>
                         </div>
@@ -662,6 +900,14 @@
 
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge" style="background-color: #6f42c1;">Management / KPI</span>
                         </div>
@@ -679,6 +925,14 @@
 
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge" style="background-color: #20c997;">Carbon Neutral / GX</span>
                         </div>
@@ -695,6 +949,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge" style="background-color: #0dcaf0; color: #000;">Manufacturing /
                                 DX</span>
@@ -716,6 +978,14 @@
 
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge" style="background-color: #fd7e14;">Construction / AI Agent</span>
                         </div>
@@ -736,6 +1006,14 @@
 
                 <div class="col-md-4">
                     <div class="card h-100 p-4">
+                        <button class="card-menu-btn" onclick="toggleCardMenu(this)">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="card-dropdown">
+                            <div class="card-dropdown-item" onclick="copyCardLink(this)"><i class="fas fa-link"></i> リンクをコピー</div>
+                            <div class="card-dropdown-item" onclick="shareCard(this)"><i class="fas fa-share-alt"></i> シェアする</div>
+                            <div class="card-dropdown-item" onclick="location.href='#contact'"><i class="fas fa-info-circle"></i> お問い合わせ</div>
+                        </div>
                         <div class="mb-3">
                             <span class="badge" style="background-color: #0d6efd;">AI Chat / Prototype</span>
                         </div>
@@ -755,7 +1033,7 @@
             </div>
         </div>
 
-        <div class="container py-5 border-top border-secondary">
+        <div class="container py-5 border-top border-secondary" id="simulator">
             <div class="row justify-content-center text-center">
                 <div class="col-md-8">
                     <h2 class="section-title">AI SIMULATOR</h2>
@@ -781,7 +1059,7 @@
                 </div>
             </div>
         </div>
-        <div class="container py-5 border-top border-secondary">
+        <div class="container py-5 border-top border-secondary" id="team">
             <div class="row justify-content-center text-center mb-5">
                 <h2 class="section-title">Team</h2>
             </div>
@@ -1360,6 +1638,54 @@
                     observer.observe(item);
                 });
             });
+
+            // Global Nav Toggle
+            function toggleNav() {
+                const nav = document.getElementById('side-nav');
+                const burger = document.getElementById('nav-hamburger');
+                nav.classList.toggle('active');
+                burger.classList.toggle('active');
+            }
+
+            // Card Menu Logic
+            function toggleCardMenu(btn) {
+                // Close all other dropdowns
+                document.querySelectorAll('.card-dropdown').forEach(d => {
+                    if (d !== btn.nextElementSibling) d.classList.remove('show');
+                });
+                btn.nextElementSibling.classList.toggle('show');
+            }
+
+            // Close card menus when clicking outside
+            window.addEventListener('click', (e) => {
+                if (!e.target.closest('.card-menu-btn')) {
+                    document.querySelectorAll('.card-dropdown').forEach(d => d.classList.remove('show'));
+                }
+            });
+
+            function copyCardLink(item) {
+                const card = item.closest('.card');
+                const title = card.querySelector('h4, h5').innerText;
+                const url = window.location.href.split('#')[0] + '#' + card.closest('[id]')?.id;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert(`「${title}」のリンクをコピーしました`);
+                });
+            }
+
+            function shareCard(item) {
+                const card = item.closest('.card');
+                const title = card.querySelector('h4, h5').innerText;
+                const text = `AxelOn: ${title}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'AxelOn Solution',
+                        text: text,
+                        url: window.location.href
+                    });
+                } else {
+                    alert('お使いのブラウザはシェア機能に対応していません。');
+                }
+            }
         </script>
 </body>
 
