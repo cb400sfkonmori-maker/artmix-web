@@ -573,17 +573,48 @@
             }
         }
 
-        function handleSubmit(e) {
+        async function handleSubmit(e) {
             e.preventDefault();
 
+            // URL provided by the user
+            const GAS_APP_URL = 'https://script.google.com/macros/s/AKfycbyja0nI3tcyzMKdiv3jAms4YN8uDY5Shi1YNtIUwgSSvgE8cm8PsEtSpz6uL0vh_Htd/exec';
+
             // 値の取得
+            const company = document.getElementById('company').value.trim();
             const jobTitle = document.getElementById('jobTitle').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
             const source = document.querySelector('input[name="source"]:checked')?.value;
+            const pains = Array.from(document.querySelectorAll('input[name="pain"]:checked')).map(el => el.value);
             const budget = document.querySelector('input[name="budget"]:checked')?.value;
+
+            // 判定ロジック
+            const execRegex = /代表|役員|社長|CEO|COO|CFO|専務|常務|取締役/i;
+            const isExec = execRegex.test(jobTitle);
+            let diagnosisResult = 'B';
+            if (budget === 'A') diagnosisResult = 'A';
+            else if (budget === 'C' && isExec) diagnosisResult = 'C';
+
+            // 送信用データ
+            const formData = {
+                company, jobTitle, name, email, source, pains, budget, diagnosisResult
+            };
 
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analytics Processing...';
             btn.disabled = true;
+
+            try {
+                // GASへデータを送信
+                await fetch(GAS_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+            } catch (err) {
+                console.error('Submission error:', err);
+            }
 
             // ローディング演出
             setTimeout(() => {
@@ -593,26 +624,18 @@
                 resultScreen.classList.remove('hidden');
                 resultScreen.classList.add('flex');
 
-                // ロジック判定
-                const execRegex = /代表|役員|社長|CEO|COO|CFO|専務|常務|取締役/i;
-                const isExec = execRegex.test(jobTitle);
-                const isVipSource = (source === 'YEGの繋がり' || source === 'ご紹介（議員・公的機関等）');
-
-                if (budget === 'A') {
-                    // Type A (Filter Out)
+                if (diagnosisResult === 'A') {
                     document.getElementById('resultA').classList.remove('hidden');
-                } else if (budget === 'C' && isExec) {
-                    // Type C (VIP)
+                } else if (diagnosisResult === 'C') {
                     document.getElementById('resultC').classList.remove('hidden');
                 } else {
-                    // Type B (Normal)
                     document.getElementById('resultB').classList.remove('hidden');
                 }
 
                 // トップへスクロール
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            }, 1800);
+            }, 1000);
         }
     </script>
 </body>
