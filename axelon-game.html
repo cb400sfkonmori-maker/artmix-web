@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>AXELON - オリジナルシューティング</title>
+    <style>
+        body {
+            margin: 0; padding: 0; background-color: #111;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; color: white; font-family: sans-serif;
+        }
+        canvas {
+            background-color: #050510; /* 少しだけ青みがかった宇宙空間の黒 */
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.2);
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas" width="384" height="512"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- ゲーム状態 ---
+        let score = 0;
+        let lives = 3;
+        let isGameOver = false;
+        let isGameClear = false;
+        let frameCount = 0;
+        
+        // --- オーディオ ---
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'shoot') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'player_hit') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
+                gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'move') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(55, now);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
+            } else if (type === 'ufo') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, now);
+                gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            }
+        }
+
+        // --- 背景（星） ---
+        const stars = Array.from({length: 80}, () => ({
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+            speed: Math.random() * 0.5 + 0.1, size: Math.random() * 1.5
+        }));
+
+        // --- プレイヤー ---
+        let player = { x: 177, y: 440, width: 30, height: 16, speed: 3, dx: 0, invincibleTimer: 0 };
+        let bullets = [];       
+        let alienBullets = [];  
+
+        // --- ボーナス機体（旧UFO） ---
+        const ufo = { x: -40, y: 60, width: 32, height: 14, speed: 2, active: false, timer: 0 };
+
+        // --- ドット絵の定義（完全オリジナルの幾何学模様） ---
+        const sprites = {
+            lime: [ // ダイヤ型
+                "   ##   ", "  ####  ", " ###### ", "########", "########", " ###### ", "  ####  ", "   ##   "
+            ],
+            cyan: [ // O（リング）型
+                " ###### ", "########", "##    ##", "##    ##", "##    ##", "##    ##", "########", " ###### " 
+            ],
+            magenta: [ // X型
+                "##    ##", " ##  ## ", "  ####  ", "   ##   ", "   ##   ", "  ####  ", " ##  ## ", "##    ##"
+            ]
+        };
+
+        // --- 敵 ---
+        const alienRows = 5;
+        const alienCols = 11;
+        let aliens = [];
+        let alienDx = 3; 
+        let alienMoveInterval = 45; 
+
+        function initAliens() {
+            const types = ['lime', 'cyan', 'cyan', 'magenta', 'magenta'];
+            const scores = [30, 20, 20, 10, 10];
+            for (let r = 0; r < alienRows; r++) {
+                for (let c = 0; c < alienCols; c++) {
+                    aliens.push({
+                        c: c, r: r,
+                        x: 40 + c * 25, y: 80 + r * 20,
+                        width: 20, height: 16, 
+                        type: types[r], points: scores[r], status: 1
+                    });
+                }
+            }
+        }
+        initAliens();
+
+        // --- シールド（旧バリア） ---
+        const bunkerPattern = [
+            "  ########  ", " ########## ", "############", "############",
+            "####    ####", "####    ####", "####    ####"
+        ];
+        let bunkers = [];
+        const bunkerStartXs = [50, 135, 220, 305];
+        
+        function initBunkers() {
+            bunkers = [];
+            bunkerStartXs.forEach(startX => {
+                let blocks = [];
+                for (let r = 0; r < bunkerPattern.length; r++) {
+                    for (let c = 0; c < bunkerPattern[r].length; c++) {
+                        if (bunkerPattern[r][c] === '#') {
+                            blocks.push({ x: startX + c * 4, y: 380 + r * 4, w: 4, h: 4, alive: true });
+                        }
+                    }
+                }
+                bunkers.push(blocks);
+            });
+        }
+        initBunkers();
+
+        // --- 入力処理 ---
+        function keyDown(e) {
+            initAudio();
+            if (e.key === 'ArrowRight' || e.key === 'Right') player.dx = player.speed;
+            if (e.key === 'ArrowLeft' || e.key === 'Left') player.dx = -player.speed;
+            if ((e.key === ' ' || e.code === 'Space') && bullets.length < 1 && player.invincibleTimer === 0 && !isGameOver) {
+                bullets.push({ x: player.x + 13, y: player.y, width: 4, height: 10, speed: 4 });
+                playSound('shoot');
+            }
+        }
+        function keyUp(e) {
+            if (e.key === 'ArrowRight' || e.key === 'Right' || e.key === 'ArrowLeft' || e.key === 'Left') player.dx = 0;
+        }
+
+        // --- 描画関数 ---
+        function drawSprite(spriteArr, color, startX, startY, pixelSize = 2) {
+            ctx.fillStyle = color;
+            for (let r = 0; r < spriteArr.length; r++) {
+                for (let c = 0; c < spriteArr[r].length; c++) {
+                    if (spriteArr[r][c] !== ' ') {
+                        ctx.fillRect(startX + c * pixelSize, startY + r * pixelSize, pixelSize, pixelSize);
+                    }
+                }
+            }
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = 'white';
+            stars.forEach(s => {
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+                s.y += s.speed;
+                if (s.y > canvas.height) s.y = 0;
+            });
+        }
+
+        function drawUI() {
+            ctx.font = '16px "Courier New", monospace'; ctx.fontWeight = 'bold';
+            
+            let scoreStr = String(score).padStart(5, '0');
+            ctx.fillStyle = '#4488FF'; ctx.textAlign = 'left'; ctx.fillText('SCORE', 20, 30);
+            ctx.fillStyle = 'white'; ctx.fillText(scoreStr, 20, 50);
+
+            // ★ ここを「AXELON」に変更しました！ ★
+            ctx.fillStyle = '#FFAA00'; ctx.textAlign = 'center'; ctx.fillText('AXELON', canvas.width / 2, 30);
+            ctx.fillStyle = 'lime'; ctx.fillText('HI-SCORE', canvas.width / 2, 50);
+            
+            ctx.fillStyle = '#4488FF'; ctx.fillRect(0, 480, canvas.width, 2);
+            
+            ctx.fillStyle = 'white'; ctx.textAlign = 'left'; ctx.fillText('LIVES:', 20, 505);
+            ctx.fillStyle = '#4488FF';
+            for(let i=0; i < lives - 1; i++) { 
+                ctx.fillRect(80 + (i * 25), 498, 16, 6); 
+                ctx.fillRect(86 + (i * 25), 494, 4, 4);
+            }
+
+            ctx.fillStyle = '#FFAA00'; ctx.textAlign = 'right'; ctx.fillText('VER 1.0', canvas.width - 20, 505);
+        }
+
+        function drawPlayer() {
+            if (player.invincibleTimer > 0 && Math.floor(frameCount / 10) % 2 === 0) return;
+            ctx.fillStyle = '#4488FF'; // 自機の色をブルー系に変更
+            ctx.fillRect(player.x + 12, player.y, 6, 4);
+            ctx.fillRect(player.x + 8, player.y + 4, 14, 4);
+            ctx.fillRect(player.x, player.y + 8, player.width, 8);
+        }
+
+        function drawAliens() {
+            aliens.forEach(a => {
+                if (a.status === 1) drawSprite(sprites[a.type], a.type, a.x, a.y);
+            });
+        }
+
+        // ボーナス機体の描画（安全な六角形のようなデザイン）
+        function drawUFO() {
+            if (ufo.active) {
+                ctx.fillStyle = '#FFAA00'; // オレンジ色
+                ctx.fillRect(ufo.x + 8, ufo.y, 16, 4);
+                ctx.fillRect(ufo.x + 4, ufo.y + 4, 24, 6);
+                ctx.fillRect(ufo.x + 8, ufo.y + 10, 16, 4);
+            }
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = '#FFFF88'; 
+            bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+            ctx.fillStyle = '#FF4444'; 
+            alienBullets.forEach(b => ctx.fillRect(b.x, b.y, 4, 10));
+        }
+
+        function drawBunkers() {
+            ctx.fillStyle = '#44FF44'; // シールドを少し明るい緑に
+            bunkers.forEach(blocks => {
+                blocks.forEach(block => {
+                    if (block.alive) ctx.fillRect(block.x, block.y, block.w, block.h);
+                });
+            });
+        }
+
+        // --- 更新処理 ---
+        function update() {
+            if (isGameOver || isGameClear) return;
+            frameCount++;
+
+            player.x += player.dx;
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            if (player.invincibleTimer > 0) player.invincibleTimer--;
+
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].y -= bullets[i].speed;
+                if (bullets[i].y < 0) bullets.splice(i, 1);
+            }
+
+            for (let i = alienBullets.length - 1; i >= 0; i--) {
+                alienBullets[i].y += alienBullets[i].speed;
+                if (alienBullets[i].y > canvas.height) alienBullets.splice(i, 1);
+            }
+
+            if (!ufo.active) {
+                ufo.timer++;
+                if (ufo.timer > 500 && Math.random() < 0.01) { 
+                    ufo.active = true; ufo.x = -40; ufo.timer = 0;
+                }
+            } else {
+                ufo.x += ufo.speed;
+                if (frameCount % 15 === 0) playSound('ufo'); 
+                if (ufo.x > canvas.width) ufo.active = false;
+            }
+
+            if (Math.random() < 0.03) { 
+                let aliveAliens = aliens.filter(a => a.status === 1);
+                if (aliveAliens.length > 0) {
+                    let columns = {};
+                    aliveAliens.forEach(a => {
+                        if (!columns[a.c] || columns[a.c].r < a.r) columns[a.c] = a;
+                    });
+                    let shooters = Object.values(columns);
+                    let shooter = shooters[Math.floor(Math.random() * shooters.length)];
+                    alienBullets.push({ x: shooter.x + 10, y: shooter.y + shooter.height, width: 4, height: 10, speed: 2 });
+                }
+            }
+
+            if (frameCount % alienMoveInterval === 0) {
+                let edgeHit = false;
+                let aliveAliens = aliens.filter(a => a.status === 1);
+                if (aliveAliens.length === 0) { isGameClear = true; return; }
+                playSound('move');
+                alienMoveInterval = Math.max(5, Math.floor(aliveAliens.length * 1.0)); 
+                aliveAliens.forEach(a => {
+                    if (a.x + alienDx > canvas.width - a.width - 10 || a.x + alienDx < 10) edgeHit = true;
+                });
+                if (edgeHit) {
+                    alienDx *= -1;
+                    aliveAliens.forEach(a => {
+                        a.y += 12; 
+                        if (a.y + a.height >= player.y) isGameOver = true; 
+                    });
+                } else {
+                    aliveAliens.forEach(a => a.x += alienDx);
+                }
+            }
+
+            // --- 当たり判定 ---
+            bullets.forEach((b, bIdx) => {
+                aliens.forEach(a => {
+                    if (a.status === 1 && b.x < a.x + a.width && b.x + b.width > a.x && b.y < a.y + a.height && b.y + b.height > a.y) {
+                        a.status = 0; bullets.splice(bIdx, 1); score += a.points; playSound('hit');
+                    }
+                });
+                if (ufo.active && b.x < ufo.x + ufo.width && b.x + b.width > ufo.x && b.y < ufo.y + ufo.height && b.y + b.height > ufo.y) {
+                    ufo.active = false; bullets.splice(bIdx, 1); score += 300; playSound('hit');
+                }
+            });
+
+            let allBullets = [...bullets.map(b => ({...b, source:'player', ref:bullets})), ...alienBullets.map(b => ({...b, source:'alien', ref:alienBullets}))];
+            allBullets.forEach(b => {
+                let hitBunker = false;
+                bunkers.forEach(blocks => {
+                    blocks.forEach(block => {
+                        if (block.alive && !hitBunker) {
+                            if (b.x < block.x + block.w && b.x + b.width > block.x && b.y < block.y + block.h && b.y + b.height > block.y) {
+                                block.alive = false; hitBunker = true;
+                            }
+                        }
+                    });
+                });
+                if (hitBunker) {
+                    let idx = b.ref.findIndex(orig => orig.x === b.x && orig.y === b.y);
+                    if(idx !== -1) b.ref.splice(idx, 1);
+                }
+            });
+
+            if (player.invincibleTimer === 0) {
+                alienBullets.forEach((ab, abIdx) => {
+                    if (ab.x < player.x + player.width && ab.x + ab.width > player.x && ab.y < player.y + player.height && ab.y + ab.height > player.y) {
+                        playSound('player_hit');
+                        lives--;
+                        alienBullets.splice(abIdx, 1);
+                        player.invincibleTimer = 100; 
+                        if (lives <= 0) isGameOver = true;
+                    }
+                });
+            }
+        }
+
+        // --- メインループ ---
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+
+            if (isGameOver) {
+                drawUI(); drawBunkers(); drawAliens(); drawUFO();
+                ctx.fillStyle = '#FF4444'; ctx.font = '40px "Courier New"'; ctx.textAlign = 'center';
+                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            if (isGameClear) {
+                drawUI(); drawPlayer();
+                ctx.fillStyle = '#4488FF'; ctx.font = '40px "Courier New"'; ctx.textAlign = 'center';
+                ctx.fillText('MISSION CLEAR!', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            update();
+            drawUI();
+            drawBunkers();
+            drawAliens();
+            drawUFO();
+            drawPlayer();
+            drawBullets();
+            
+            requestAnimationFrame(loop);
+        }
+
+        document.addEventListener('keydown', keyDown);
+        document.addEventListener('keyup', keyUp);
+
+        loop();
+    </script>
+</body>
+</html>
