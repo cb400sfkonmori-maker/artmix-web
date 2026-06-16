@@ -87,13 +87,22 @@
             background-color: #1e1e1e;
             border: 1px solid #444;
             color: #ffffff;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
         }
 
         .card:hover {
             transform: translateY(-10px);
             box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
             border-color: #4a90e2;
+        }
+
+        .card i.fa-3x {
+            transition: transform 0.3s, text-shadow 0.3s;
+        }
+
+        .card:hover i.fa-3x {
+            transform: scale(1.12);
+            text-shadow: 0 0 20px rgba(74, 144, 226, 0.7);
         }
 
         .service-desc {
@@ -483,6 +492,7 @@
         .side-nav-link:hover {
             color: #4a90e2;
             padding-left: 10px;
+            text-shadow: 0 0 12px rgba(74, 144, 226, 0.6);
         }
 
         .side-nav-link i {
@@ -490,6 +500,12 @@
             text-align: center;
             color: #4a90e2;
             font-size: 1rem;
+            transition: transform 0.3s, text-shadow 0.3s;
+        }
+
+        .side-nav-link:hover i {
+            transform: scale(1.2);
+            text-shadow: 0 0 12px rgba(74, 144, 226, 0.9);
         }
 
         /* --- Card Specific Hamburger/Meatball Menu --- */
