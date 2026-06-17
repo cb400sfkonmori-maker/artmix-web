@@ -349,11 +349,11 @@
         /* Generic scroll reveal animation */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(40px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
         }
 
-        .reveal.visible {
+        .reveal.active {
             opacity: 1;
             transform: translateY(0);
         }
@@ -1745,7 +1745,7 @@
                     });
                 }, observerOptions);
 
-                document.querySelectorAll('.bacronym-item, .reveal').forEach(item => {
+                document.querySelectorAll('.bacronym-item').forEach(item => {
                     observer.observe(item);
                 });
             });
@@ -1797,6 +1797,25 @@
                     alert('お使いのブラウザはシェア機能に対応していません。');
                 }
             }
+        </script>
+
+        <!-- ▼▼▼ スクロールを監視してrevealを動かすスクリプト ▼▼▼ -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        // 画面内に要素が入ってきたら active クラスをつける
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                        }
+                    });
+                }, {
+                    threshold: 0.1 // 要素が10%見えたらアニメーションを開始する
+                });
+
+                // すべての .reveal 要素を監視対象にする
+                document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            });
         </script>
 </body>
 
