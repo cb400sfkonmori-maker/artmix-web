@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Attractor Art — AxelOn Inc.</title>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
     <style>
@@ -157,6 +157,33 @@ function mouseClicked() {
 function mouseWheel(event) {
     zoom *= (1 - event.delta * 0.0012);
     zoom  = constrain(zoom, 0.2, 6.0);
+    return false;
+}
+
+// ---- スマホ：ピンチでズーム ----
+let prevPinchDist = -1;
+
+function touchStarted() {
+    if (touches.length === 2) {
+        prevPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+    }
+    return false; // ブラウザのデフォルトズームを無効化
+}
+
+function touchMoved() {
+    if (touches.length === 2) {
+        let d = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+        if (prevPinchDist > 0) {
+            zoom *= d / prevPinchDist;
+            zoom  = constrain(zoom, 0.2, 6.0);
+        }
+        prevPinchDist = d;
+    }
+    return false; // ページスクロールを無効化
+}
+
+function touchEnded() {
+    prevPinchDist = -1;
     return false;
 }
 
