@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attractor Art — AxelOn Inc.</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.28);
+            line-height: 2.1;
+            pointer-events: none;
+            letter-spacing: 0.05em;
+        }
+        #mode-label {
+            display: inline-block;
+            padding: 3px 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.22);
+            letter-spacing: 0.08em;
+        }
+        #credit {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.16);
+            pointer-events: none;
+            letter-spacing: 0.12em;
+        }
+    </style>
+</head>
+<body>
+<div id="info">
+    MOVE MOUSE to rotate &nbsp;·&nbsp; SCROLL to zoom<br>
+    CLICK to mutate &nbsp;·&nbsp; SPACE to pause<br>
+    <span id="mode-label">Thomas Attractor</span>
+</div>
+<div id="credit">© AxelOn Inc.</div>
+
+<script>
+// ---- Thomas Strange Attractor ----
+// dx/dt = sin(y) - b*x
+// dy/dt = sin(z) - b*y
+// dz/dt = sin(x) - b*z
+// b ≈ 0.208 でカオス的な3Dトーラス構造を形成
+
+const N     = 500;
+const DT    = 0.05;
+const SCALE = 100;
+
+let pts = [];
+let ang, tang;
+let zoom   = 1.0;
+let paused = false;
+let b      = 0.208;   // アトラクタの減衰係数（変えると形が変わる）
+
+const PRESETS = [
+    { label: 'Thomas  b=0.208', b: 0.208 },
+    { label: 'Thomas  b=0.33',  b: 0.33  },
+    { label: 'Thomas  b=0.19',  b: 0.19  },
+];
+let preset = 0;
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    ang  = createVector(0.3, 0.2, 0);
+    tang = createVector(0.3, 0.2, 0);
+    initParticles();
+}
+
+function initParticles() {
+    pts = [];
+    for (let i = 0; i < N; i++) {
+        // アトラクタ近傍のランダム点からスタート
+        pts.push({
+            x: random(-1, 1),
+            y: random(-1, 1),
+            z: random(-1, 1),
+        });
+    }
+}
+
+function draw() {
+    background(0, 12);   // 低アルファ → トレイル（残像）効果
+    translate(width / 2, height / 2);
+
+    // マウス追従
+    tang.y = map(mouseX, 0, width,  -PI,           PI,           true);
+    tang.x = map(mouseY, 0, height, -HALF_PI*0.75, HALF_PI*0.75, true);
+    ang.lerp(tang, 0.07);
+
+    for (let p of pts) {
+        if (!paused) {
+            // Thomas Attractor 更新
+            let dx = (sin(p.y) - b * p.x) * DT;
+            let dy = (sin(p.z) - b * p.y) * DT;
+            let dz = (sin(p.x) - b * p.z) * DT;
+            p.x += dx;
+            p.y += dy;
+            p.z += dz;
+
+            // 発散したパーティクルをリセット（稀）
+            if (abs(p.x) > 15 || abs(p.y) > 15 || abs(p.z) > 15) {
+                p.x = random(-1, 1);
+                p.y = random(-1, 1);
+                p.z = random(-1, 1);
+            }
+        }
+
+        let pos = project3D(p.x * SCALE, p.y * SCALE, p.z * SCALE);
+
+        // 奥行きで明るさ・サイズを変化（立体感）
+        let brightness = map(pos.z, -SCALE * 3, SCALE * 3, 160, 255, true);
+        let sz         = map(pos.z, -SCALE * 3, SCALE * 3, 0.7, 2.5, true);
+
+        stroke(brightness, brightness, brightness, 210);
+        strokeWeight(sz);
+        point(pos.x, pos.y);
+    }
+}
+
+// ---- 3D 投影 ----
+function project3D(x, y, z) {
+    let cy = cos(ang.y), sy = sin(ang.y);
+    let x1 = x * cy + z * sy;
+    let z1 = -x * sy + z * cy;
+
+    let cx = cos(ang.x), sx = sin(ang.x);
+    let y2 = y * cx - z1 * sx;
+    let z2 = y * sx + z1 * cx;
+
+    let sc = 700 / (700 + z2) * zoom;
+    return { x: x1 * sc, y: y2 * sc, z: z2 };
+}
+
+// ---- インタラクション ----
+function mouseClicked() {
+    // プリセットを切り替えてアトラクタの形を変える
+    preset = (preset + 1) % PRESETS.length;
+    b = PRESETS[preset].b;
+    document.getElementById('mode-label').textContent = PRESETS[preset].label;
+    initParticles(); // 新しい形で再スタート
+}
+
+function mouseWheel(event) {
+    zoom *= (1 - event.delta * 0.0012);
+    zoom  = constrain(zoom, 0.2, 6.0);
+    return false;
+}
+
+function keyPressed() {
+    if (keyCode === 32) paused = !paused;
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
