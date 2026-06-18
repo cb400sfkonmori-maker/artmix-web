@@ -50,155 +50,118 @@
 <div id="credit">© AxelOn Inc.</div>
 
 <script>
-// ---- Shape parameters ----
-const NUM_SPIRALS  = 85;
-const NUM_POINTS   = 200;
-const HALF_H       = 270;
-const R_MIN_BASE   = 32;
-const R_MAX        = 162;
-const TURNS        = 11;
+// ---- パラメータ ----
+const N       = 500;   // パーティクル数（point()コール数/frame）
+const HALF_H  = 265;
+const R_MIN_B = 32;
+const R_MAX   = 160;
 
-// ---- State ----
-let ang, tang;          // smooth rotation vectors (reference手法)
+// ---- 状態 ----
+let ang, tang;
 let counter  = 0;
-let counting = true;    // false = paused
+let counting = true;
 let mode     = 0;
 let zoom     = 1.0;
+let pts      = [];
 
-// ---- Mode definitions ----
 const MODES = [
-    {
-        label:     'MODE 1 : Green & Blue',
-        speed:      0.006,
-        lerpSpd:    0.08,
-        darkAlpha:  160,
-        colorFn:    colorGreenBlue,
-        initTang:   [0.05, 0, 0],
-    },
-    {
-        label:     'MODE 2 : Fire & Ember',
-        speed:      0.010,
-        lerpSpd:    0.05,
-        darkAlpha:  145,
-        colorFn:    colorFireEmber,
-        initTang:   [0.08, 0.3, 0],
-    },
-    {
-        label:     'MODE 3 : Mono Chrome',
-        speed:     -0.004,
-        lerpSpd:    0.13,
-        darkAlpha:  100,
-        colorFn:    colorMono,
-        initTang:   [0.0, 0, 0],
-    },
+    { label: 'MODE 1 : Green & Blue', lerpSpd: 0.07, rotSpd:  0.014, colorFn: cGreenBlue },
+    { label: 'MODE 2 : Fire & Ember', lerpSpd: 0.04, rotSpd:  0.022, colorFn: cFireEmber },
+    { label: 'MODE 3 : Mono Chrome',  lerpSpd: 0.12, rotSpd: -0.009, colorFn: cMono      },
 ];
 
-// ---- p5.js setup ----
+// ---- setup ----
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    strokeCap(ROUND);
     ang  = createVector(0.05, 0, 0);
     tang = createVector(0.05, 0, 0);
+    for (let i = 0; i < N; i++) pts.push(newPt(random())); // t をバラけさせる
 }
 
+function newPt(startT) {
+    return {
+        t:     startT ?? random(),     // 高さ位置 0〜1
+        theta: random(TWO_PI),         // 回転角
+        spd:   random(0.003, 0.010),   // 上昇速度
+    };
+}
+
+// ---- draw ----
 function draw() {
-    background(18, 18, 18);
+    // 低アルファのback → フレームをまたぐトレイル（残像）効果
+    background(18, 18, 18, 18);
     translate(width / 2, height / 2);
 
     let cm = MODES[mode];
-
-    // カウンタ更新
     if (counting) counter++;
 
-    // ---- マウス追従 (参考コード準拠) ----
-    // mouseX → Y軸回転、mouseY → X軸回転
-    tang.y = map(mouseX, 0, width,  -PI,          PI,          true);
-    tang.x = map(mouseY, 0, height, -HALF_PI * 0.75, HALF_PI * 0.75, true);
-    ang.lerp(tang, cm.lerpSpd);  // 慣性つきの追従
+    // マウス追従（参考コード準拠: ang.lerp）
+    tang.y = map(mouseX, 0, width,  -PI,           PI,           true);
+    tang.x = map(mouseY, 0, height, -HALF_PI*0.75, HALF_PI*0.75, true);
+    ang.lerp(tang, cm.lerpSpd);
 
-    // ---- 脈動パラメータ (cos でゆっくり変形) ----
-    // counter/220 → 約 220 frame (≒3〜4秒) で1サイクル
-    let pulse = cos(counter / 220);  // -1 〜 1
+    // 脈動パラメータ
+    let pulse = cos(counter / 220);
 
-    // ---- 描画 ----
-    for (let i = 0; i < NUM_SPIRALS; i++) {
-        let phase  = (i / NUM_SPIRALS) * TWO_PI;
-        let isDark = (i % 5 === 0 || i % 5 === 3);
+    for (let p of pts) {
+        // 位置を更新
+        p.theta += cm.rotSpd;
+        p.t     += p.spd;
+        if (p.t > 1.02) Object.assign(p, newPt(0)); // 上端を超えたら底へ
 
-        for (let j = 0; j < NUM_POINTS - 1; j++) {
-            let t1 = j       / (NUM_POINTS - 1);
-            let t2 = (j + 1) / (NUM_POINTS - 1);
+        // ハイパーボロイド面上の3D座標
+        let yn   = p.t * 2 - 1;
+        let rMin = R_MIN_B * (1 + 0.45 * pulse);
+        let r    = sqrt(rMin*rMin + (R_MAX*R_MAX - rMin*rMin) * yn*yn);
+        if (yn < 0) r *= 1 + 0.18 * (-yn);
 
-            let p1 = computePoint(t1, phase, pulse, cm.speed);
-            let p2 = computePoint(t2, phase, pulse, cm.speed);
+        let pos = project3D(r * cos(p.theta), yn * HALF_H, r * sin(p.theta));
 
-            if (isDark) {
-                stroke(52, 54, 60, cm.darkAlpha);
-            } else {
-                stroke(cm.colorFn(t1));
-            }
-            strokeWeight(0.65);
-            line(p1.x, p1.y, p2.x, p2.y);
-        }
+        // 奥行きで明るさ・サイズを変える（立体感）
+        let sz    = map(pos.z, -300, 300, 1.0, 3.5, true);
+        let alpha = map(pos.z, -300, 300, 130, 245, true);
+
+        stroke(cm.colorFn(p.t, alpha));
+        strokeWeight(sz);
+        point(pos.x, pos.y);
     }
 }
 
-// ---- 3D 座標計算 ----
-function computePoint(t, phase, pulse, speed) {
-    let yn = t * 2 - 1;  // -1(下端) 〜 1(上端)
-
-    // 中央の細さが pulse で呼吸するように変化
-    let rMin = R_MIN_BASE * (1 + 0.45 * pulse);
-    let r    = sqrt(rMin * rMin + (R_MAX * R_MAX - rMin * rMin) * yn * yn);
-
-    // 下端を少し広く（非対称）
-    if (yn < 0) r *= (1 + 0.18 * (-yn));
-
-    let theta = phase + t * TWO_PI * TURNS + counter * speed;
-
-    return project3D(r * cos(theta), yn * HALF_H, r * sin(theta));
-}
-
+// ---- 3D投影（ang に追従） ----
 function project3D(x, y, z) {
-    // ang.y → Y軸回転（mouseX に追従）
     let cy = cos(ang.y), sy = sin(ang.y);
     let x1 = x * cy + z * sy;
     let z1 = -x * sy + z * cy;
 
-    // ang.x → X軸回転（mouseY に追従）
     let cx = cos(ang.x), sx = sin(ang.x);
     let y2 = y * cx - z1 * sx;
     let z2 = y * sx + z1 * cx;
 
-    // 透視投影
     let sc = 760 / (760 + z2) * zoom;
-    return { x: x1 * sc, y: y2 * sc };
+    return { x: x1 * sc, y: y2 * sc, z: z2 };
 }
 
 // ---- カラースキーム ----
-function colorGreenBlue(t) {
-    // t=0: 下端(ディープブルー) → t=1: 上端(ティール/グリーン)
+function cGreenBlue(t, a) {
     if (t < 0.5) {
         let b = t / 0.5;
-        return color(lerp(5, 12, b), lerp(28, 108, b), lerp(195, 162, b), 215);
+        return color(lerp(5,12,b), lerp(28,108,b), lerp(195,162,b), a);
     }
     let b = (t - 0.5) / 0.5;
-    return color(lerp(12, 5, b), lerp(108, 148, b), lerp(162, 110, b), 215);
+    return color(lerp(12,5,b), lerp(108,148,b), lerp(162,110,b), a);
 }
 
-function colorFireEmber(t) {
-    // t=0: ディープレッド → t=1: ゴールド
+function cFireEmber(t, a) {
     if (t < 0.5) {
         let b = t / 0.5;
-        return color(lerp(160, 220, b), lerp(10, 60, b), lerp(5, 10, b), 210);
+        return color(lerp(160,220,b), lerp(10,60,b), lerp(5,10,b), a);
     }
     let b = (t - 0.5) / 0.5;
-    return color(lerp(220, 245, b), lerp(60, 165, b), lerp(10, 20, b), 210);
+    return color(lerp(220,245,b), lerp(60,165,b), lerp(10,20,b), a);
 }
 
-function colorMono(t) {
-    let v = lerp(55, 185, t);
-    return color(v, v, v, 205);
+function cMono(t, a) {
+    return color(lerp(100, 235, t), lerp(100, 235, t), lerp(100, 235, t), a);
 }
 
 // ---- インタラクション ----
@@ -206,11 +169,9 @@ function mouseClicked() {
     mode = (mode + 1) % MODES.length;
     let cm = MODES[mode];
     document.getElementById('mode-label').textContent = cm.label;
-
-    // 参考コード準拠: モード切替時にカウンタと向きをリセット
     if (counting) {
-        tang       = createVector(...cm.initTang);
-        counter    = 0;
+        tang = createVector(0.05, 0, 0);
+        counter = 0;
         frameCount = 0;
     }
 }
