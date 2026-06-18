@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiral Art — AxelOn Inc.</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #121212; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.28);
+            line-height: 2.1;
+            pointer-events: none;
+            letter-spacing: 0.05em;
+        }
+        #mode-label {
+            display: inline-block;
+            padding: 3px 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.22);
+            letter-spacing: 0.08em;
+        }
+        #credit {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.16);
+            pointer-events: none;
+            letter-spacing: 0.12em;
+        }
+    </style>
+</head>
+<body>
+<div id="info">
+    MOVE MOUSE to rotate &nbsp;·&nbsp; SCROLL to zoom<br>
+    CLICK to change MODE &nbsp;·&nbsp; SPACE to pause<br>
+    <span id="mode-label">MODE 1 : Green &amp; Blue</span>
+</div>
+<div id="credit">© AxelOn Inc.</div>
+
+<script>
+// ---- Shape parameters ----
+const NUM_SPIRALS  = 85;
+const NUM_POINTS   = 200;
+const HALF_H       = 270;
+const R_MIN_BASE   = 32;
+const R_MAX        = 162;
+const TURNS        = 11;
+
+// ---- State ----
+let ang, tang;          // smooth rotation vectors (reference手法)
+let counter  = 0;
+let counting = true;    // false = paused
+let mode     = 0;
+let zoom     = 1.0;
+
+// ---- Mode definitions ----
+const MODES = [
+    {
+        label:     'MODE 1 : Green & Blue',
+        speed:      0.006,
+        lerpSpd:    0.08,
+        darkAlpha:  160,
+        colorFn:    colorGreenBlue,
+        initTang:   [0.05, 0, 0],
+    },
+    {
+        label:     'MODE 2 : Fire & Ember',
+        speed:      0.010,
+        lerpSpd:    0.05,
+        darkAlpha:  145,
+        colorFn:    colorFireEmber,
+        initTang:   [0.08, 0.3, 0],
+    },
+    {
+        label:     'MODE 3 : Mono Chrome',
+        speed:     -0.004,
+        lerpSpd:    0.13,
+        darkAlpha:  100,
+        colorFn:    colorMono,
+        initTang:   [0.0, 0, 0],
+    },
+];
+
+// ---- p5.js setup ----
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    strokeCap(ROUND);
+    ang  = createVector(0.05, 0, 0);
+    tang = createVector(0.05, 0, 0);
+}
+
+function draw() {
+    background(18, 18, 18);
+    translate(width / 2, height / 2);
+
+    let cm = MODES[mode];
+
+    // カウンタ更新
+    if (counting) counter++;
+
+    // ---- マウス追従 (参考コード準拠) ----
+    // mouseX → Y軸回転、mouseY → X軸回転
+    tang.y = map(mouseX, 0, width,  -PI,          PI,          true);
+    tang.x = map(mouseY, 0, height, -HALF_PI * 0.75, HALF_PI * 0.75, true);
+    ang.lerp(tang, cm.lerpSpd);  // 慣性つきの追従
+
+    // ---- 脈動パラメータ (cos でゆっくり変形) ----
+    // counter/220 → 約 220 frame (≒3〜4秒) で1サイクル
+    let pulse = cos(counter / 220);  // -1 〜 1
+
+    // ---- 描画 ----
+    for (let i = 0; i < NUM_SPIRALS; i++) {
+        let phase  = (i / NUM_SPIRALS) * TWO_PI;
+        let isDark = (i % 5 === 0 || i % 5 === 3);
+
+        for (let j = 0; j < NUM_POINTS - 1; j++) {
+            let t1 = j       / (NUM_POINTS - 1);
+            let t2 = (j + 1) / (NUM_POINTS - 1);
+
+            let p1 = computePoint(t1, phase, pulse, cm.speed);
+            let p2 = computePoint(t2, phase, pulse, cm.speed);
+
+            if (isDark) {
+                stroke(52, 54, 60, cm.darkAlpha);
+            } else {
+                stroke(cm.colorFn(t1));
+            }
+            strokeWeight(0.65);
+            line(p1.x, p1.y, p2.x, p2.y);
+        }
+    }
+}
+
+// ---- 3D 座標計算 ----
+function computePoint(t, phase, pulse, speed) {
+    let yn = t * 2 - 1;  // -1(下端) 〜 1(上端)
+
+    // 中央の細さが pulse で呼吸するように変化
+    let rMin = R_MIN_BASE * (1 + 0.45 * pulse);
+    let r    = sqrt(rMin * rMin + (R_MAX * R_MAX - rMin * rMin) * yn * yn);
+
+    // 下端を少し広く（非対称）
+    if (yn < 0) r *= (1 + 0.18 * (-yn));
+
+    let theta = phase + t * TWO_PI * TURNS + counter * speed;
+
+    return project3D(r * cos(theta), yn * HALF_H, r * sin(theta));
+}
+
+function project3D(x, y, z) {
+    // ang.y → Y軸回転（mouseX に追従）
+    let cy = cos(ang.y), sy = sin(ang.y);
+    let x1 = x * cy + z * sy;
+    let z1 = -x * sy + z * cy;
+
+    // ang.x → X軸回転（mouseY に追従）
+    let cx = cos(ang.x), sx = sin(ang.x);
+    let y2 = y * cx - z1 * sx;
+    let z2 = y * sx + z1 * cx;
+
+    // 透視投影
+    let sc = 760 / (760 + z2) * zoom;
+    return { x: x1 * sc, y: y2 * sc };
+}
+
+// ---- カラースキーム ----
+function colorGreenBlue(t) {
+    // t=0: 下端(ディープブルー) → t=1: 上端(ティール/グリーン)
+    if (t < 0.5) {
+        let b = t / 0.5;
+        return color(lerp(5, 12, b), lerp(28, 108, b), lerp(195, 162, b), 215);
+    }
+    let b = (t - 0.5) / 0.5;
+    return color(lerp(12, 5, b), lerp(108, 148, b), lerp(162, 110, b), 215);
+}
+
+function colorFireEmber(t) {
+    // t=0: ディープレッド → t=1: ゴールド
+    if (t < 0.5) {
+        let b = t / 0.5;
+        return color(lerp(160, 220, b), lerp(10, 60, b), lerp(5, 10, b), 210);
+    }
+    let b = (t - 0.5) / 0.5;
+    return color(lerp(220, 245, b), lerp(60, 165, b), lerp(10, 20, b), 210);
+}
+
+function colorMono(t) {
+    let v = lerp(55, 185, t);
+    return color(v, v, v, 205);
+}
+
+// ---- インタラクション ----
+function mouseClicked() {
+    mode = (mode + 1) % MODES.length;
+    let cm = MODES[mode];
+    document.getElementById('mode-label').textContent = cm.label;
+
+    // 参考コード準拠: モード切替時にカウンタと向きをリセット
+    if (counting) {
+        tang       = createVector(...cm.initTang);
+        counter    = 0;
+        frameCount = 0;
+    }
+}
+
+function mouseWheel(event) {
+    zoom *= (1 - event.delta * 0.0012);
+    zoom  = constrain(zoom, 0.2, 5.0);
+    return false;
+}
+
+function keyPressed() {
+    if (keyCode === 32) counting = !counting;
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
