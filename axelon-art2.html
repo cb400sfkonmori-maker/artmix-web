@@ -166,8 +166,9 @@ let prevPinchDist = -1;
 function touchStarted() {
     if (touches.length === 2) {
         prevPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+        return false; // 2本指のみデフォルト無効化（ブラウザズームを防ぐ）
     }
-    return false; // ブラウザのデフォルトズームを無効化
+    // 1本指はreturnしない → タップがmouseClickedに変換される
 }
 
 function touchMoved() {
@@ -179,12 +180,12 @@ function touchMoved() {
         }
         prevPinchDist = d;
     }
-    return false; // ページスクロールを無効化
+    return false; // ドラッグ中のページスクロールを防ぐ
 }
 
 function touchEnded() {
     prevPinchDist = -1;
-    return false;
+    // return false しない → mouseClicked が発火してモード切替できる
 }
 
 function keyPressed() {
