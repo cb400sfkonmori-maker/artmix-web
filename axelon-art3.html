@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MVV Art — AxelOn Inc.</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.28);
+            line-height: 2.1;
+            pointer-events: none;
+            letter-spacing: 0.05em;
+        }
+        #credit {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.16);
+            pointer-events: none;
+            letter-spacing: 0.12em;
+        }
+    </style>
+</head>
+<body>
+<div id="info">
+    CLICK to spawn &nbsp;·&nbsp; SPACE to reset<br>
+</div>
+<div id="credit">© AxelOn Inc.</div>
+
+<script>
+const { Engine, Bodies, Body, World } = Matter;
+
+// AxelOn MVV テキスト
+const MVV = "MISSION 未来を動かすハンドルと、どこへでも行ける地図を。VISION ここで育ってよかったと、20年後に帰ってきたくなる街。VALUE 自分で考え、自分で決める。なぜ？を面白がる。違いを混ぜると強くなる。";
+
+// AxelOnブランドカラー3色
+const PALETTE = [
+    [212, 175,  55],  // Gold  (Mission)
+    [ 74, 144, 226],  // Blue  (Vision)
+    [200, 200, 200],  // White (Value)
+];
+
+let engine, world;
+let blocks  = [];
+let walls   = [];
+let noiseTex;
+let counter = 0;
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    engine = Engine.create();
+    world  = engine.world;
+    engine.gravity.y = 1.0;
+    buildWalls();
+    buildTexture();
+}
+
+function buildWalls() {
+    walls.forEach(w => World.remove(world, w));
+    let floor = Bodies.rectangle(width / 2, height + 50, width * 4, 100, { isStatic: true });
+    let left  = Bodies.rectangle(-50, height / 2, 100, height * 4, { isStatic: true });
+    let right = Bodies.rectangle(width + 50, height / 2, 100, height * 4, { isStatic: true });
+    walls = [floor, left, right];
+    World.add(world, walls);
+}
+
+function buildTexture() {
+    noiseTex = createGraphics(width, height);
+    noiseTex.noStroke();
+    for (let i = 0; i < width * height * 3 / 100; i++) {
+        noiseTex.fill(random(20, 50), 10);
+        noiseTex.ellipse(random(width), random(height), random(3), random(3));
+    }
+}
+
+function spawnBlock(x, y, d) {
+    let tSize = random(d / 4, d);
+    let ch    = MVV.substr(counter++ % MVV.length, 1);
+    let col   = PALETTE[floor(random(PALETTE.length))];
+
+    let body  = Bodies.rectangle(x, y, tSize * 1.0, tSize * 1.2, {
+        restitution: 0.25,
+        friction:    0.5,
+        frictionAir: 0.01,
+    });
+    Body.setVelocity(body,        { x: random(-2, 2), y: random(0, 2) });
+    Body.setAngularVelocity(body, random(-0.08, 0.08));
+    World.add(world, body);
+
+    blocks.push({ body, text: ch, textSize: tSize, col });
+}
+
+function mousePressed() {
+    spawnBlock(mouseX, mouseY, random(width / 12, width / 6));
+}
+
+function keyPressed() {
+    if (key === ' ') {
+        blocks.forEach(b => World.remove(world, b.body));
+        blocks  = [];
+        counter = 0;
+    }
+}
+
+function draw() {
+    Engine.update(engine, 1000 / 60);
+
+    // 10フレームごとに自動生成
+    if (frameCount % 10 === 0) {
+        let d = random(width / 12, width / 6);
+        spawnBlock(random(d / 2, width - d / 2), -d, d);
+    }
+
+    // ---- 描画 ----
+    background(10, 10, 10);
+    image(noiseTex, 0, 0);
+
+    drawingContext.shadowColor   = 'rgba(0,0,0,0.8)';
+    drawingContext.shadowBlur    = 10;
+    drawingContext.shadowOffsetX = 2;
+    drawingContext.shadowOffsetY = 5;
+
+    textFont('serif');
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    noStroke();
+
+    for (let i = blocks.length - 1; i >= 0; i--) {
+        let b = blocks[i];
+        let p = b.body.position;
+
+        if (p.x < -150 || p.x > width + 150 || p.y > height + 150) {
+            World.remove(world, b.body);
+            blocks.splice(i, 1);
+            continue;
+        }
+
+        push();
+        translate(p.x, p.y);
+        rotate(b.body.angle);
+        fill(b.col[0], b.col[1], b.col[2]);
+        textSize(b.textSize);
+        text(b.text, 0, 0);
+        pop();
+    }
+
+    drawingContext.shadowBlur = 0;
+
+    // 上限を超えたら古いものを削除
+    while (blocks.length > 130) {
+        World.remove(world, blocks[0].body);
+        blocks.splice(0, 1);
+    }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    buildWalls();
+    buildTexture();
+}
+
+function touchStarted() {
+    spawnBlock(touches[0].x, touches[0].y, random(width / 12, width / 6));
+    return false;
+}
+</script>
+</body>
+</html>
