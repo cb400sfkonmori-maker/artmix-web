@@ -622,22 +622,30 @@
                 company, jobTitle, name, email, source, pains, budget, diagnosisResult
             };
 
+            // スパム判定（役職欄が長すぎる or 営業キーワードを含む）
+            const SPAM_KEYWORDS = ['無料', 'シミュレーション', 'Indeed', '採用支援', '求人掲載', '人材紹介', '採用代行'];
+            const isSpam = jobTitle.length > 25
+                || SPAM_KEYWORDS.some(kw => jobTitle.includes(kw))
+                || /[【】〖〗]/.test(jobTitle);
+
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analytics Processing...';
             btn.disabled = true;
 
             let submissionFailed = false;
-            try {
-                // GASへデータを送信
-                await fetch(GAS_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-            } catch (err) {
-                console.error('Submission error:', err);
-                submissionFailed = true;
+            if (!isSpam) {
+                try {
+                    // GASへデータを送信
+                    await fetch(GAS_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } catch (err) {
+                    console.error('Submission error:', err);
+                    submissionFailed = true;
+                }
             }
 
             // ローディング演出
