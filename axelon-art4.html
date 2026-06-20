@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AxelOn Grid — AxelOn Inc.</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0a; overflow: hidden; }
+        canvas { display: block; }
+        #info {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.28);
+            line-height: 2.1;
+            pointer-events: none;
+            letter-spacing: 0.05em;
+        }
+        #credit {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.16);
+            pointer-events: none;
+            letter-spacing: 0.12em;
+        }
+    </style>
+</head>
+<body>
+<div id="info">CLICK / DRAG to burst</div>
+<div id="credit">© AxelOn Inc.</div>
+
+<script>
+const PALETTE = [
+    [212, 175,  55],  // Gold
+    [ 74, 144, 226],  // Blue
+    [200, 200, 200],  // White
+];
+
+var main;
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    background(10, 10, 10);
+    noStroke();
+    main = makeGrid(windowWidth, windowHeight, 20);
+}
+
+function draw() {
+    background(10, 10, 10);
+    noStroke();
+    textSize(20);
+    textFont('serif');
+
+    main.forEach(elem => {
+        elem.update();
+        elem.draw();
+    });
+}
+
+function mouseDragged() { burst(); }
+function mousePressed()  { burst(); }
+
+function touchStarted() { burst(); return false; }
+function touchMoved()   { burst(); return false; }
+
+function burst() {
+    var mouse = new Posn(mouseX, mouseY);
+    main.forEach(elem => {
+        elem.applyForce(elem.pos.offset(mouse).mul(pow(2, -(elem.pos.dist(mouse) * 0.04))));
+    });
+}
+
+function makeGrid(w, h, blockSize) {
+    var arr = [];
+    const letters = "AxelOn";
+    let idx = 0;
+    for (var i = blockSize; i < w; i += blockSize) {
+        for (var j = blockSize; j < h; j += blockSize) {
+            arr.push(new Point(i, j, letters[idx % letters.length], null, PALETTE[idx % PALETTE.length]));
+            idx++;
+        }
+    }
+    return arr;
+}
+
+function Point(x, y, letter, mass, colorArr) {
+    this.supposed = new Posn(x, y);
+    this.pos      = new Posn(x, y);
+    this.vel      = new Posn(0, 0);
+    this.acc      = new Posn(0, 0);
+    this.letter   = letter;
+    this.mass     = mass == null ? 1 : mass;
+    this.color    = colorArr || [200, 200, 200];
+
+    this.draw = () => {
+        fill(this.color[0], this.color[1], this.color[2]);
+        text(this.letter, this.pos.x, this.pos.y);
+    };
+
+    this.update = () => {
+        this.applyForce(new Posn(random(-0.01, 0.01), random(-0.01, 0.01)));
+        this.seek(this.supposed);
+        this.vel.add(this.acc);
+        this.pos.add(this.vel);
+        this.vel.mul(0.95);
+        this.acc.mul(0);
+    };
+
+    this.seek = (target) => {
+        this.applyForce(this.pos.offset(target).mul(this.pos.dist(target)).mul(-0.0001));
+    };
+
+    this.applyForce = (force) => { this.acc.add(force); };
+}
+
+function Posn(x, y) {
+    this.x = x;
+    this.y = y;
+
+    this.get    = () => new Posn(this.x, this.y);
+    this.offset = (o) => new Posn(this.x - o.x, this.y - o.y);
+    this.dist   = (o) => sqrt(sq(o.x - this.x) + sq(o.y - this.y));
+
+    this.add = (o) => {
+        this.x += o.x; this.y += o.y;
+        return this.get();
+    };
+
+    this.mul = (c) => {
+        this.x *= c; this.y *= c;
+        return this.get();
+    };
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    main = makeGrid(windowWidth, windowHeight, 20);
+}
+</script>
+</body>
+</html>
